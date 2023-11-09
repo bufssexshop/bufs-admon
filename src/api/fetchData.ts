@@ -1,4 +1,4 @@
-const defaultHost = 'https://bufs-api.onrender.com' || process.env.NEXT_PUBLIC_API_URL
+const defaultHost = process.env.NEXT_PUBLIC_API_URL
 
 let token = ''
 

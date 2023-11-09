@@ -3,6 +3,7 @@
 import { SnackbarProvider } from 'notistack'
 import Providers from './reactQueryProvider'
 import { NextUIProvider } from '@nextui-org/react'
+import SessionAuthProvider from '@/context/SessionAuthProvider'
 
 type TProps = {
   children: React.ReactNode;
@@ -13,11 +14,13 @@ const ClientProviders = ({ children }: TProps) => {
 
   return (
     <NextUIProvider>
-      <SnackbarProvider maxSnack={3}>
+      <SessionAuthProvider>
         <Providers>
-          {children}
+          <SnackbarProvider maxSnack={3}>
+            {children}
+          </SnackbarProvider>
         </Providers>
-      </SnackbarProvider>
+      </SessionAuthProvider>
     </NextUIProvider>
   )
 }

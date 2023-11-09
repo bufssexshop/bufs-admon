@@ -1,14 +1,12 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
-
+import React, { useState } from 'react'
 import { MailIcon } from '@/SVG/MailIcon'
 import { LockIcon } from '@/SVG/LockIcon'
 import { loginSchema } from '@/helpers/formSchemas'
 import { EyeFilledIcon } from '@/SVG/EyeFilledIcon'
 import { joiResolver } from '@hookform/resolvers/joi'
 import { useForm, SubmitHandler } from 'react-hook-form'
-import { UserCircleIcon } from '@heroicons/react/24/solid'
 import { EyeSlashFilledIcon } from '@/SVG/EyeSlashFilledIcon'
 import { Button, Card, CardBody, CardFooter, CardHeader, Divider, Input } from '@nextui-org/react'
 import { useMutation } from '@tanstack/react-query'
@@ -16,6 +14,7 @@ import { mutationData } from '@/api/fetchData'
 import { useRouter } from 'next/navigation'
 import { useSnackbar } from 'notistack'
 import Image from 'next/image'
+import { signIn } from 'next-auth/react'
 
 type FormValues = {
   email: string;
@@ -47,6 +46,7 @@ const Login = () => {
     onSuccess: ({ token, message }) => {
       if (message) enqueueSnackbar(message, { variant: 'error' })
       if (token) {
+        signIn()
         enqueueSnackbar('Session iniciada correctamente!', { variant: 'success' })
         localStorage.setItem('sexshop-token', token)
         router.push('/dashboard', { scroll: false })
@@ -56,13 +56,29 @@ const Login = () => {
 
   const { isPending } = loginMutation;
 
-  const onSubmit: SubmitHandler<FormValues> = async (data) => {
-    try {
-      await loginMutation.mutateAsync(data);
-    } catch (error) {
-      console.log('xxx hubo un error: ', error);
+  // const onSubmit: SubmitHandler<FormValues> = async (data) => {
+  //   try {
+  //     await loginMutation.mutateAsync(data);
+  //   } catch (error) {
+  //     console.log('xxx hubo un error: ', error);
+  //   }
+  // }
+
+  const submit: SubmitHandler<FormValues> = async (data) => {
+    const responseNextAuth = await signIn("credentials", {
+      email: data.email,
+      password: data.password,
+      redirect: false,
+    });
+
+    if (responseNextAuth?.error) {
+      // setErrors(responseNextAuth.error.split(","));
+      console.log('xxx errors: ', responseNextAuth?.error);
+      return;
     }
-  }
+
+    router.push("/dashboard");
+  };
 
   return (
     <div className='
@@ -76,7 +92,7 @@ const Login = () => {
         className="max-w-[400px] bg-white/20 backdrop-blur-xl"
         shadow="md"
       >
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(submit)}>
           <CardHeader className='flex justify-center'>
             <Image
               width={100}
@@ -135,7 +151,7 @@ const Login = () => {
                   color="default"
                   variant='flat'
                 >
-                  Iniciar sesion
+                  {isPending ? 'Iniciando' : 'Iniciar session'}
                 </Button>
               </div>
             </div>
