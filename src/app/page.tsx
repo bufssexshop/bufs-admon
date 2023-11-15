@@ -65,11 +65,14 @@ const Login = () => {
   // }
 
   const submit: SubmitHandler<FormValues> = async (data) => {
+    console.log('xxx => 1');
+
     const responseNextAuth = await signIn("credentials", {
       email: data.email,
       password: data.password,
       redirect: false,
     });
+
 
     if (responseNextAuth?.error) {
       // setErrors(responseNextAuth.error.split(","));

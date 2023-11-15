@@ -10,10 +10,6 @@ const handler = NextAuth({
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials, req) {
-        console.log('xxx credentials: ', credentials);
-
-        console.log('xxx entramos 2');
-
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/usuarios/signin`,
           {
