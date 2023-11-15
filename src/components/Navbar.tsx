@@ -3,15 +3,11 @@
 import React from "react";
 import {Navbar, NavbarBrand, NavbarContent, NavbarItem, Link, Button} from "@nextui-org/react";
 import { useRouter, usePathname } from "next/navigation";
+import { signOut } from "next-auth/react";
 
 const NavigationBar = () => {
   const router = useRouter();
   const pathname = usePathname();
-
-  const logOut = () => {
-    localStorage.removeItem('sexshop-token')
-    router.push('/', { scroll: true })
-  }
 
   return (
     <Navbar className="dark bg-[#130b29]">
@@ -48,7 +44,7 @@ const NavigationBar = () => {
       </NavbarContent>
       <NavbarContent justify="end">
         <NavbarItem>
-          <Button onClick={logOut} color="primary" href="#" variant="flat">
+          <Button onClick={() => signOut({ callbackUrl: 'http://localhost:3000/' })} color="primary" href="#" variant="flat">
             Cerrar sesion
           </Button>
         </NavbarItem>

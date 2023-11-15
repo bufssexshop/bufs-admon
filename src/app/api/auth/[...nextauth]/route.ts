@@ -23,16 +23,24 @@ const handler = NextAuth({
         );
 
         const user = await res.json();
-        console.log('xxx res: ', res);
 
-        if (user.error) {
-          return user.error
-        } else {
-          return res
-        }
+        if (user.message) throw user;
+        return user
       }
     })
-  ]
+  ],
+  callbacks: {
+    async jwt({ token, user }) {
+      return { ...token, ...user }
+    },
+    async session({ session, token }) {
+      session.user = token as any;
+      return session;
+    }
+  },
+  pages: {
+    signIn: '/',
+  }
 })
 
 export { handler as GET, handler as POST }

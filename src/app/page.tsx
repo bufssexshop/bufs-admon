@@ -29,6 +29,7 @@ const Login = () => {
 
   const router = useRouter();
   const { enqueueSnackbar } = useSnackbar()
+  const [loading, setLoading] = useState(false)
   const [isVisible, setIsVisible] = useState(false)
   const toggleVisibility = () => setIsVisible(!isVisible)
 
@@ -41,45 +42,21 @@ const Login = () => {
     mode: 'onChange'
   })
 
-  const loginMutation = useMutation({
-    mutationFn: ({ email, password }: FormValues) => mutationData('usuarios/signin', 'POST', { email, password }),
-    onSuccess: ({ token, message }) => {
-      if (message) enqueueSnackbar(message, { variant: 'error' })
-      if (token) {
-        signIn()
-        enqueueSnackbar('Session iniciada correctamente!', { variant: 'success' })
-        localStorage.setItem('sexshop-token', token)
-        router.push('/dashboard', { scroll: false })
-      }
-    }
-  })
-
-  const { isPending } = loginMutation;
-
-  // const onSubmit: SubmitHandler<FormValues> = async (data) => {
-  //   try {
-  //     await loginMutation.mutateAsync(data);
-  //   } catch (error) {
-  //     console.log('xxx hubo un error: ', error);
-  //   }
-  // }
-
   const submit: SubmitHandler<FormValues> = async (data) => {
-    console.log('xxx => 1');
-
+    setLoading(true)
     const responseNextAuth = await signIn("credentials", {
       email: data.email,
       password: data.password,
       redirect: false,
     });
-
+    setLoading(false)
 
     if (responseNextAuth?.error) {
-      // setErrors(responseNextAuth.error.split(","));
-      console.log('xxx errors: ', responseNextAuth?.error);
+      enqueueSnackbar(responseNextAuth?.error, { variant: 'error' })
       return;
     }
 
+    enqueueSnackbar('Session iniciada correctamente!', { variant: 'success' })
     router.push("/dashboard");
   };
 
@@ -149,12 +126,12 @@ const Login = () => {
               <div className='flex justify-center'>
                 <Button
                   type='submit'
-                  isLoading={isPending}
+                  isLoading={loading}
                   className='w-min-content text-white bg-black/20'
                   color="default"
                   variant='flat'
                 >
-                  {isPending ? 'Iniciando' : 'Iniciar session'}
+                  {loading ? 'Cargando' : 'Iniciar session'}
                 </Button>
               </div>
             </div>
