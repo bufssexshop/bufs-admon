@@ -6,7 +6,7 @@ import { NextUIProvider } from '@nextui-org/react'
 import SessionAuthProvider from '@/context/SessionAuthProvider'
 
 type TProps = {
-  children: React.ReactNode;
+  children: React.ReactNode
 }
 
 const ClientProviders = ({ children }: TProps) => {

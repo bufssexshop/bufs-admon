@@ -2,7 +2,7 @@
 import { SessionProvider } from "next-auth/react"
 
 type TProps = {
-  children: React.ReactNode;
+  children: React.ReactNode
 }
 
 
@@ -14,4 +14,4 @@ const SessionAuthProvider = ({ children }: TProps) => {
   )
 }
 
-export default SessionAuthProvider;
+export default SessionAuthProvider

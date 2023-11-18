@@ -9,16 +9,14 @@ import { joiResolver } from '@hookform/resolvers/joi'
 import { useForm, SubmitHandler } from 'react-hook-form'
 import { EyeSlashFilledIcon } from '@/SVG/EyeSlashFilledIcon'
 import { Button, Card, CardBody, CardFooter, CardHeader, Divider, Input } from '@nextui-org/react'
-import { useMutation } from '@tanstack/react-query'
-import { mutationData } from '@/api/fetchData'
 import { useRouter } from 'next/navigation'
 import { useSnackbar } from 'notistack'
 import Image from 'next/image'
 import { signIn } from 'next-auth/react'
 
 type FormValues = {
-  email: string;
-  password: string;
+  email: string
+  password: string
 }
 
 const Login = () => {
@@ -27,7 +25,7 @@ const Login = () => {
     'string.empty': 'Este campo es requerido'
   })
 
-  const router = useRouter();
+  const router = useRouter()
   const { enqueueSnackbar } = useSnackbar()
   const [loading, setLoading] = useState(false)
   const [isVisible, setIsVisible] = useState(false)
@@ -48,17 +46,17 @@ const Login = () => {
       email: data.email,
       password: data.password,
       redirect: false,
-    });
+    })
     setLoading(false)
 
     if (responseNextAuth?.error) {
       enqueueSnackbar(responseNextAuth?.error, { variant: 'error' })
-      return;
+      return
     }
 
     enqueueSnackbar('Session iniciada correctamente!', { variant: 'success' })
-    router.push("/dashboard");
-  };
+    router.push("/dashboard")
+  }
 
   return (
     <div className='

@@ -5,7 +5,7 @@ import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 type TProps = {
-  children: React.ReactNode;
+  children: React.ReactNode
 }
 
 function Providers ({ children }: TProps) {

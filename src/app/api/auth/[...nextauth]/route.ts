@@ -1,5 +1,5 @@
-import NextAuth from "next-auth/next";
-import CredentialsProvider from "next-auth/providers/credentials";
+import NextAuth from "next-auth/next"
+import CredentialsProvider from "next-auth/providers/credentials"
 
 const handler = NextAuth({
   providers: [
@@ -20,11 +20,11 @@ const handler = NextAuth({
             }),
             headers: { "Content-Type": "application/json" },
           }
-        );
+        )
 
-        const user = await res.json();
+        const user = await res.json()
 
-        if (user.message) throw user;
+        if (user.message) throw user
         return user
       }
     })
@@ -34,8 +34,8 @@ const handler = NextAuth({
       return { ...token, ...user }
     },
     async session({ session, token }) {
-      session.user = token as any;
-      return session;
+      session.user = token as any
+      return session
     }
   },
   pages: {

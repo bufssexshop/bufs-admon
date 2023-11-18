@@ -1,7 +1,7 @@
 import React from 'react'
 
 type TProps = {
-  [key: string]: string;
+  [key: string]: string
 }
 
 export const MailIcon = (props: TProps) => (

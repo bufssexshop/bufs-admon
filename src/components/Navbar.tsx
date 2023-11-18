@@ -1,13 +1,13 @@
 'use client'
 
-import React from "react";
-import {Navbar, NavbarBrand, NavbarContent, NavbarItem, Link, Button} from "@nextui-org/react";
-import { useRouter, usePathname } from "next/navigation";
-import { signOut } from "next-auth/react";
+import React from "react"
+import {Navbar, NavbarBrand, NavbarContent, NavbarItem, Link, Button} from "@nextui-org/react"
+import { useRouter, usePathname } from "next/navigation"
+import { signOut } from "next-auth/react"
 
 const NavigationBar = () => {
-  const router = useRouter();
-  const pathname = usePathname();
+  const router = useRouter()
+  const pathname = usePathname()
 
   return (
     <Navbar className="dark bg-[#130b29]">
@@ -50,7 +50,7 @@ const NavigationBar = () => {
         </NavbarItem>
       </NavbarContent>
     </Navbar>
-  );
+  )
 }
 
-export default NavigationBar;
+export default NavigationBar
