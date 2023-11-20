@@ -11,19 +11,20 @@ import { EyeSlashFilledIcon } from '@/SVG/EyeSlashFilledIcon'
 import { Button, Card, CardBody, CardFooter, CardHeader, Divider, Input } from '@nextui-org/react'
 import { useRouter } from 'next/navigation'
 import { useSnackbar } from 'notistack'
-import Image from 'next/image'
 import { signIn } from 'next-auth/react'
+import Image from 'next/image'
 
 type FormValues = {
   email: string
   password: string
 }
 
+const schema = loginSchema.messages({
+  'any.required': 'Este campo es requerido',
+  'string.empty': 'Este campo es requerido'
+})
+
 const Login = () => {
-  const schema = loginSchema.messages({
-    'any.required': 'Este campo es requerido',
-    'string.empty': 'Este campo es requerido'
-  })
 
   const router = useRouter()
   const { enqueueSnackbar } = useSnackbar()
