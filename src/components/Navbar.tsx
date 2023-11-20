@@ -22,17 +22,29 @@ const NavigationBar = () => {
       </NavbarBrand>
       <NavbarContent className="hidden sm:flex gap-4" justify="center">
         <NavbarItem isActive>
-          <Link underline={pathname === '/dashboard' ? 'always' : 'none'} color={pathname === '/dashboard' ? undefined : 'foreground'} href="#">
+          <Link
+            underline={pathname === '/admon/dashboard' ? 'always' : 'none'}
+            color={pathname === '/admon/dashboard' ? undefined : 'foreground'}
+            href="/admon/dashboard"
+          >
             Dashboard
           </Link>
         </NavbarItem>
         <NavbarItem>
-          <Link color="foreground" href="#">
+          <Link
+            underline={pathname === '/admon/productos' ? 'always' : 'none'}
+            color={pathname === '/admon/productos' ? undefined : 'foreground'}
+            href="/admon/productos"
+          >
             Productos
           </Link>
         </NavbarItem>
         <NavbarItem>
-          <Link color="foreground" href="#" aria-current="page">
+          <Link
+            underline={pathname === '/admon/usuarios' ? 'always' : 'none'}
+            color={pathname === '/admon/usuarios' ? undefined : 'foreground'}
+            href="/admon/usuarios"
+          >
             Usuarios
           </Link>
         </NavbarItem>
