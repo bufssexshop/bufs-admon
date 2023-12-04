@@ -52,7 +52,7 @@ const Productos = () => {
 
   const onEditorStateChange = (editorState: SetStateAction<EditorState>) =>  setEditorState(editorState);
 
-  const handleSelectionChange = (e: { target: { value: SetStateAction<string>; }; }) => {
+  const handleSelectionChange = (e: { target: { value: string; }; }) => {
     setCategory(e.target.value);
   };
 
@@ -116,6 +116,8 @@ const Productos = () => {
   const onSubmit = (formValues: FormValues) => createProductMutation.mutate(formValues)
   console.log('xxx errors: ', errors);
 
+  const handleSelectChange = (key: React.Key): any => setCurrentTab(String(key));
+
   return (
     <section className="p-10 w-full flex flex-col items-center gap-10">
 
@@ -124,7 +126,7 @@ const Productos = () => {
         color="primary"
         aria-label="Opciones"
         selectedKey={currentTab}
-        onSelectionChange={setCurrentTab}
+        onSelectionChange={handleSelectChange}
       >
         <Tab key="search" title="Buscar"/>
         <Tab key="create" title="Crear"/>
