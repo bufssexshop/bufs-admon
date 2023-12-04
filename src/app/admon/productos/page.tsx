@@ -1,14 +1,15 @@
 'use client'
 
+import dynamic from 'next/dynamic';
 import { EditorState } from 'draft-js'
 import { useSnackbar } from 'notistack'
 import { useSession } from "next-auth/react"
-import { Editor } from 'react-draft-wysiwyg'
+const Editor = dynamic(() => import('react-draft-wysiwyg').then((mod) => mod.Editor), { ssr: false });
 import { SetStateAction, useState } from "react"
 import { productSchema } from '@/helpers/formSchemas'
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css"
 import { categories, subcategories } from '@/helpers/constants'
-import { Button, Input, Select, SelectItem, Switch, Tab, Tabs } from "@nextui-org/react"
+import { Button, CircularProgress, Input, Select, SelectItem, Switch, Tab, Tabs } from "@nextui-org/react"
 import { joiResolver } from '@hookform/resolvers/joi'
 import { useMutation } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
