@@ -48,6 +48,7 @@ const Login = () => {
       password: data.password,
       redirect: false,
     })
+
     setLoading(false)
 
     if (responseNextAuth?.error) {
