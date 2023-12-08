@@ -60,7 +60,6 @@ const Login = () => {
       enqueueSnackbar('Session iniciada correctamente!', { variant: 'success' })
       router.push("/admon/dashboard")
     }
-
   }
 
   return (
