@@ -56,8 +56,11 @@ const Login = () => {
       return
     }
 
-    enqueueSnackbar('Session iniciada correctamente!', { variant: 'success' })
-    router.push("/admon/dashboard")
+    if (responseNextAuth?.ok) {
+      enqueueSnackbar('Session iniciada correctamente!', { variant: 'success' })
+      router.push("/admon/dashboard")
+    }
+
   }
 
   return (
