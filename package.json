@@ -30,6 +30,7 @@
   "devDependencies": {
     "@tanstack/react-query-devtools": "^5.8.1",
     "@types/draft-js": "^0.11.15",
+    "@types/draftjs-to-html": "^0.8.4",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

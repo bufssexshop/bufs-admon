@@ -1,7 +1,7 @@
 type TPageProps = {
-  children: React.ReactNode;
+  children: React.ReactNode
 }
 
-const Admon = () => <></>;
+const Admon = () => <></>
 
 export default Admon

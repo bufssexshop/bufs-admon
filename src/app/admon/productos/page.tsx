@@ -1,38 +1,34 @@
 'use client'
 
-import dynamic from 'next/dynamic';
-import { EditorState } from 'draft-js'
+import { ChangeEvent, useState } from "react"
+import draftToHtml from 'draftjs-to-html';
+import { convertToRaw, EditorState } from 'draft-js'
 import { useSnackbar } from 'notistack'
 import { useSession } from "next-auth/react"
-const Editor = dynamic(() => import('react-draft-wysiwyg').then((mod) => mod.Editor), { ssr: false });
-import { SetStateAction, useState } from "react"
 import { productSchema } from '@/helpers/formSchemas'
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css"
-import { categories, subcategories } from '@/helpers/constants'
-import { Button, CircularProgress, Input, Select, SelectItem, Switch, Tab, Tabs } from "@nextui-org/react"
+import { Tab, Tabs } from "@nextui-org/react"
 import { joiResolver } from '@hookform/resolvers/joi'
 import { useMutation } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
+import ProductForm from "@/components/ProductForm"
+import SearchProductsList from "@/components/SearchProductsList";
 
-
-type TItems = { name: string, value: string }
 type TResponseData = string
 
 type FormValues = {
   codigo: string
   nombre: string
-  precio: number
+  precio: string
   detalles: string
   promocion: boolean
-  precioCredito: number
-  valorPromocion: number
+  precioCredito: string
+  valorPromocion: string
   categoria: string
   subcategoria: string
-  categoriaDos?: string
-  subcategoriaDos?: string
+  categoriaDos: string
+  subcategoriaDos: string
   disponible: boolean
-  image?: File
-  image2?: File
 }
 
 const schema = productSchema.messages({
@@ -42,46 +38,103 @@ const schema = productSchema.messages({
 
 const Productos = () => {
   const { data: session } = useSession()
+  const [image, setImage] = useState<File | null>(null)
   const { enqueueSnackbar } = useSnackbar()
-  const [category, setCategory] = useState<string>('none');
-  const [currentTab, setCurrentTab] = useState<string>('create');
-  const [doubleCategory, setDoubleCategory] = useState<boolean>(false);
+  const [secondImage, setSecondImage] = useState<File | null>(null)
+  const [secondCategory,setSecondCategory] = useState<string>('none')
+  const [category, setCategory] = useState<string>('none')
+  const [currentTab, setCurrentTab] = useState<string>('create')
+
+  const setters = {
+    setCategory,
+    setSecondCategory,
+    setImage,
+    setSecondImage,
+  }
 
   const [editorState, setEditorState] = useState(
     () => EditorState.createEmpty(),
-  );
+  )
 
-  const onEditorStateChange = (editorState: SetStateAction<EditorState>) =>  setEditorState(editorState);
+  const details = draftToHtml(convertToRaw(editorState.getCurrentContent()));
 
-  const handleSelectionChange = (e: { target: { value: string; }; }) => {
-    setCategory(e.target.value);
+  const getters = {
+    image,
+    category,
+    secondImage,
+    editorState,
+    secondCategory,
+  }
+
+  type TKeys = 'categoria' | 'subcategoria' | 'categoriaDos' | 'subcategoriaDos';
+  const handleSelectionChange = (e: { target: { value: string } }, key: TKeys) => {
+    if (key === 'categoria') setCategory(e.target.value)
+    if (key === 'categoriaDos') setSecondCategory(e.target.value)
+    setValue(key, e.target.value)
+  }
+
+  const defaultValues = {
+    disponible: true,
+    promocion: false,
+    valorPromocion: '0',
+    precioCredito: '0',
+    categoriaDos: 'none',
+    subcategoriaDos: 'none'
   };
 
   const {
     register,
+    setValue,
     handleSubmit,
     formState: { errors }
   } = useForm<FormValues>({
     resolver: joiResolver(schema),
-    mode: 'onChange'
+    mode: 'onChange',
+    defaultValues,
   })
 
-  const createProduct = async (formData: FormValues) => {
-    console.log('xxx formData: ', formData);
+  const onEditorStateChange = (editorState: EditorState) =>  {
+    setEditorState(editorState);
 
-    // const data = new FormData()
-    // data.append('codigo', codigo)
-    // data.append('nombre', nombre)
-    // data.append('precio', precio)
-    // data.append('detalles', text)
-    // data.append('promocion', false)
-    // data.append('valorPromocion', 0)
-    // data.append('categoria', categoria)
-    // data.append('precioCredito', precio)
-    // data.append('disponible', disponible)
-    // data.append('categoriaDos', categoriaDos)
-    // data.append('subcategoria', subcategoria)
-    // data.append('subcategoriaDos', subcategoriaDos)
+    const contentState = convertToRaw(editorState.getCurrentContent());
+    const detallesValue = JSON.stringify(contentState);
+    setValue('detalles', detallesValue);
+  }
+
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>, key: string) => {
+    const file = e.target.files && e.target.files[0];
+
+    if (file)
+      if (key === 'image') {
+        setImage(file);
+      } else {
+        setSecondImage(file)
+      }
+  };
+
+  const createProduct = async (formData: FormValues) => {
+    console.log('xxx formData: ', formData)
+
+    const {
+      codigo, nombre, precio, detalles, promocion,
+      valorPromocion, categoria, subcategoria, precioCredito,
+      disponible, categoriaDos, subcategoriaDos,
+    } = formData;
+
+    const data = new FormData()
+    data.append('codigo', codigo)
+    data.append('nombre', nombre)
+    data.append('precio', precio)
+    data.append('detalles', details)
+    data.append('categoria', categoria)
+    data.append('promocion', promocion.toString())
+    data.append('disponible', disponible.toString())
+    data.append('valorPromocion', valorPromocion)
+    data.append('subcategoria', subcategoria)
+    data.append('precioCredito', precioCredito)
+    data.append('categoriaDos', categoriaDos)
+    data.append('subcategoriaDos', subcategoriaDos)
+
 
     // if(file) {
     //   data.append('image', file[0], file[0].name)
@@ -110,17 +163,18 @@ const Productos = () => {
     onSuccess: () => {
       enqueueSnackbar('Producto creado exitosamente.', {
         variant: 'success',
-      });
+      })
     }
-  });
+  })
 
   const onSubmit = (formValues: FormValues) => createProductMutation.mutate(formValues)
-  console.log('xxx errors: ', errors);
+  console.log('xxx errors: ', errors)
 
-  const handleSelectChange = (key: React.Key): any => setCurrentTab(String(key));
+  const handleSelectChange = (key: React.Key): any => setCurrentTab(String(key))
+  const handleChangeSwitch = (value: boolean): any => setValue('disponible', value);
 
   return (
-    <section className="p-10 w-full flex flex-col items-center gap-10">
+    <section className="p-10 w-full min-h-screen flex flex-col items-center gap-10">
 
       <Tabs
         radius="full"
@@ -135,138 +189,22 @@ const Productos = () => {
       </Tabs>
 
       {currentTab === 'create' && (
-        <article className="bg-slate-900 dark p-10 rounded-md lg:w-2/4">
-          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-10 relative">
-            <p className="text-white font-bold text-xl pb-10 text-center">Crear Producto</p>
-            <section className="absolute right-0 top-0 flex flex-col gap-2">
-              <Switch
-                size="sm"
-                color="success"
-                defaultSelected
-                aria-label="Disponible"
-                {...register('disponible')}
-              >
-                Disponible
-              </Switch>
-              <Switch size="sm" isSelected={doubleCategory} onValueChange={setDoubleCategory} aria-label="Disponible">
-                Doble categoria
-              </Switch>
-            </section>
-            <section className=" flex gap-10">
-              <Input
-                type="text"
-                label="Código"
-                {...register('codigo')}
-              />
-              <Input
-                type="text"
-                label="Nombre"
-                {...register('nombre')}
-              />
-            </section>
+        <ProductForm
+          setters={setters}
+          getters={getters}
+          register={register}
+          onSubmit={createProduct}
+          handleSubmit={handleSubmit}
+          onEditorChange={onEditorStateChange}
+          handleChangeSwitch={handleChangeSwitch}
+          handleChangeSelector={handleSelectionChange}
+          handleChangeInputImage={handleFileChange}
+          errors={errors}
+        />
+      )}
 
-            <section className=" flex gap-10">
-              <Input
-                type="text"
-                label="Precio"
-                {...register('precio')}
-              />
-              <Input
-                type="text"
-                label="Precio a crédito"
-                {...register('precioCredito')}
-              />
-            </section>
-
-            {/* FIRST CATEGORY */}
-            <section className="flex gap-10">
-              <Select
-                label="Seleccione la categoría"
-                className="max-w-md"
-                onChange={handleSelectionChange}
-                fullWidth
-              >
-                {categories.map(({ name, value }: TItems) => (
-                  <SelectItem key={value} value={value}>
-                    {name}
-                  </SelectItem>
-                ))}
-              </Select>
-
-              <Select
-                label="Seleccione la subcategoría"
-                className="max-w-md"
-                fullWidth
-              >
-                {category === 'none' ? (
-                  <SelectItem key='none' value='none'>
-                    Elegir...
-                  </SelectItem>
-                ) : subcategories[category].map(({ name, value }: TItems) => (
-                  <SelectItem key={name} value={value}>
-                    {name}
-                  </SelectItem>
-                ))}
-              </Select>
-            </section>
-
-            {/* DOUBLE CATEGORY */}
-            {doubleCategory && (
-              <section className=" flex gap-10">
-                <Select
-                  label="Seleccione la categoría dos"
-                  className="max-w-md"
-                  onChange={handleSelectionChange}
-                >
-                  {categories.map(({ name, value }: TItems) => (
-                    <SelectItem key={value} value={value}>
-                      {name}
-                    </SelectItem>
-                  ))}
-                </Select>
-
-                <Select
-                  label="Seleccione la subcategoría dos"
-                  className="max-w-md"
-                >
-                  {category === 'none' ? (
-                    <SelectItem key='none' value='none'>
-                      Elegir...
-                    </SelectItem>
-                  ) : subcategories[category].map(({ name, value }: TItems) => (
-                    <SelectItem key={name} value={value}>
-                      {name}
-                    </SelectItem>
-                  ))}
-                </Select>
-              </section>
-            )}
-
-            <section className=" flex gap-10">
-              <Input
-                type="file"
-                {...register('image')}
-              />
-              <Input
-                type="file"
-                {...register('image2')}
-              />
-            </section>
-
-            <section>
-              <Editor
-                editorState={editorState}
-                editorClassName="bg-slate-800 text-white rounded-sm"
-                onEditorStateChange={onEditorStateChange}
-              />
-            </section>
-
-            <section className="flex justify-end gap-10">
-              <Button variant="bordered" color="default">Descartar</Button>
-              <Button color="primary">Guardar</Button>
-            </section>
-          </form>
-        </article>
+      {currentTab === 'search' && (
+        <SearchProductsList />
       )}
     </section>
   )

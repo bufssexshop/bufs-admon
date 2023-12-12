@@ -4,7 +4,7 @@ import { useSession } from "next-auth/react"
 import { useQuery } from '@tanstack/react-query'
 import {Button, Card, CardFooter, CircularProgress} from "@nextui-org/react"
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
-import {Image} from "@nextui-org/react";
+import {Image} from "@nextui-org/react"
 import { Pie } from 'react-chartjs-2'
 
 ChartJS.register(ArcElement, Tooltip, Legend)
@@ -98,7 +98,7 @@ const Dashboard = () => {
 
   return (
     <main>
-      <section className="w-full bg-slate-800 flex justify-center items-start p-10">
+      <section className="w-full min-h-screen bg-slate-800 flex justify-center items-start p-10">
         <article className="lg:w-full h-3/4 flex justify-around">
           <div className="flex flex-col gap-10 w-[300px]">
             <CustomCard
