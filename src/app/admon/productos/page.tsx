@@ -13,6 +13,7 @@ import { useMutation } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import ProductForm from "@/components/ProductForm"
 import SearchProductsList from "@/components/SearchProductsList";
+import ProductsList from "@/components/ProductsList";
 
 type TResponseData = string
 
@@ -183,10 +184,19 @@ const Productos = () => {
         selectedKey={currentTab}
         onSelectionChange={handleSelectChange}
       >
+        <Tab key="list" title="Listar"/>
         <Tab key="search" title="Buscar"/>
         <Tab key="create" title="Crear"/>
         <Tab key="edit" title="Editar"/>
       </Tabs>
+
+      {currentTab === 'list' && (
+        <ProductsList />
+      )}
+
+      {currentTab === 'search' && (
+        <SearchProductsList />
+      )}
 
       {currentTab === 'create' && (
         <ProductForm
@@ -201,10 +211,6 @@ const Productos = () => {
           handleChangeInputImage={handleFileChange}
           errors={errors}
         />
-      )}
-
-      {currentTab === 'search' && (
-        <SearchProductsList />
       )}
     </section>
   )

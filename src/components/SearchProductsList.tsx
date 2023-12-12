@@ -66,8 +66,12 @@ const SearchProductsList = () => {
     mutationFn: (data: TData) => searchProducts(data),
     onSuccess: (response) => {
       setProductsList(response)
-      enqueueSnackbar('Productos encontrados.', {
-        variant: 'success',
+      if (response.length > 0)
+        enqueueSnackbar('Productos encontrados.', {
+          variant: 'success',
+        })
+      else  enqueueSnackbar('No se encontraron productos.', {
+        variant: 'info',
       })
     }
   })
@@ -85,7 +89,11 @@ const SearchProductsList = () => {
           <p>Nombre</p>
         </div>
         <Input className="dark" label={isSelected ? 'Por nombre' : 'Por código'} type="text" onValueChange={setSearch} />
-        <Button color="primary" isLoading={isPending} onClick={() => searchProductsMutation.mutate(data)}>
+        <Button
+          color="primary"
+          isLoading={isPending}
+          onClick={onSearch}
+        >
           Buscar
         </Button>
       </div>
