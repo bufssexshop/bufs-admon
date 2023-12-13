@@ -1,17 +1,12 @@
 'use client'
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useSnackbar } from "notistack";
 import { useSession } from "next-auth/react"
-import { useMutation } from '@tanstack/react-query'
-import {Table, Input, TableHeader, TableColumn, TableBody, TableRow, TableCell, getKeyValue, Spinner, Button, Switch} from "@nextui-org/react";
+import { useQuery } from '@tanstack/react-query'
+import {Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination, Button} from "@nextui-org/react";
 
-type TData = {
-  search: string,
-  typeSearch: string,
-}
-
-type TResponseData = {
+type TProduct = {
   _id: string;
   codigo: string;
   nombre: string;
@@ -31,24 +26,31 @@ type TResponseData = {
   subcategoriaDos: string;
 };
 
+type TResponse = {
+  products: TProduct[]
+  totalProducts: number
+  limit: number
+  totalPages: number
+  page: number
+  pagingCounter: number
+  hasPrevPage: boolean
+  hasNextPage: boolean
+  prevPage: number | null
+  nextPage: number | null
+} | undefined
 
 const ProductsList = () => {
   const { data: session } = useSession()
-  const { enqueueSnackbar } = useSnackbar()
-  const [isSelected, setIsSelected] = useState<boolean>(true);
-  const [products, setProducts] = useState<TResponseData[]>([]);
+  const [page, setPage] = useState<number>(1);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(10);
+  const [productsInfo, setProductsInfo] = useState<TResponse>();
 
-  const data: TData = {
-    search: 'lubricante',
-    typeSearch: 'forName',
-  }
 
-  const searchProducts = async (data: TData) => {
+  const searchProducts = async () => {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/productos/getSearch`,
+      `${process.env.NEXT_PUBLIC_API_URL}/productos/all?page=${page}&limit=${rowsPerPage}`,
       {
-        method: "POST",
-        body: JSON.stringify(data),
+        method: "GET",
         headers: {
           "Content-Type": "application/json",
           authorization: `Bearer ${session?.user?.token}`,
@@ -57,26 +59,66 @@ const ProductsList = () => {
     )
 
     const res = await response.json()
-    return res as TResponseData[]
+    return res as TResponse
   }
 
-  const searchProductsMutation = useMutation({
-    mutationFn: (data: TData) => searchProducts(data),
-    onSuccess: (response) => {
-      setProducts(response);
-      if (response.length > 0)
-        enqueueSnackbar('Productos encontrados.', {
-          variant: 'success',
-        })
-      else  enqueueSnackbar('No se encontraron productos.', {
-        variant: 'info',
-      })
-    }
+  const getProductsQuery = useQuery({
+    queryKey: ['allProducts', page, rowsPerPage],
+    queryFn: searchProducts
   })
 
   useEffect(() => {
-    searchProductsMutation.mutate(data);
-  }, [])
+    const { data } = getProductsQuery;
+    if (data) {
+      setProductsInfo(data as TResponse);
+    }
+  }, [getProductsQuery]);
+
+  const onRowsPerPageChange = React.useCallback((e: { target: { value: any; }; }) => {
+    setRowsPerPage(Number(e.target.value));
+    setPage(1);
+  }, []);
+
+  const topContent = React.useMemo(() => {
+    return (
+      <div className="flex flex-col gap-4">
+        <div className="flex justify-between items-center">
+          <span className="text-default-400 text-small">Total {productsInfo?.totalProducts || 0} productos</span>
+          <label className="flex items-center text-default-400 text-small">
+            Resultados por página:
+            <select
+              className="bg-transparent outline-none text-default-400 text-small"
+              onChange={onRowsPerPageChange}
+            >
+              <option value="10">10</option>
+              <option value="20">20</option>
+              <option value="25">25</option>
+              <option value="30">30</option>
+
+              <option value="35">35</option>
+              <option value="40">40</option>
+            </select>
+          </label>
+        </div>
+      </div>
+    );
+  }, [onRowsPerPageChange, productsInfo]);
+
+  const bottomContent = useMemo(() => {
+    return (
+      <div className="dark flex w-full justify-center">
+        <Pagination
+          isCompact
+          showControls
+          showShadow
+          color="primary"
+          page={page}
+          total={productsInfo?.totalPages || 0}
+          onChange={setPage}
+        />
+      </div>
+    )
+  }, [productsInfo?.totalPages, page])
 
   return (
     <Table
@@ -86,6 +128,8 @@ const ProductsList = () => {
         table: "dark min-h-[200px]",
         tbody: 'dark text-white'
       }}
+      topContent={topContent}
+      bottomContent={bottomContent}
     >
       <TableHeader>
         <TableColumn key="code" allowsSorting>
@@ -111,7 +155,7 @@ const ProductsList = () => {
         </TableColumn>
       </TableHeader>
       <TableBody>
-        {products.map((row) =>
+        {(productsInfo?.products || []).map((row: TProduct) => (
           <TableRow key={row._id}>
             <TableCell>{row.codigo}</TableCell>
             <TableCell>{row.nombre}</TableCell>
@@ -121,7 +165,7 @@ const ProductsList = () => {
             <TableCell>{row.subcategoria}</TableCell>
             <TableCell>{row.disponible ? 'Sí' : 'No'}</TableCell>
           </TableRow>
-        )}
+        ))}
       </TableBody>
     </Table>
   );
