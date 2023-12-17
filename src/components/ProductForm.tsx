@@ -2,8 +2,10 @@
 
 import { useState } from 'react'
 import dynamic from 'next/dynamic'
+import noImage from '../../public/noImageAvailable.png'
 import { categories, subcategories } from '@/helpers/constants'
-import { Button, Input, Select, SelectItem, Switch } from "@nextui-org/react"
+import { Avatar, Button, Input, Select, SelectItem, Switch } from "@nextui-org/react"
+import { TrashIcon } from '@heroicons/react/24/solid'
 const Editor = dynamic(() => import('react-draft-wysiwyg').then((mod) => mod.Editor), { ssr: false })
 
 type TItems = { name: string, value: string }
@@ -130,18 +132,53 @@ const ProductForm = (props: any) => {
 
         <section className=" flex gap-10">
           <input
+            id="fileInput_1"
             type="file"
             accept="image/*"
             onChange={(e) => props.handleChangeInputImage(e, 'image')}
             className='w-full rounded-medium py-4 px-3 text-tiny bg-default-100 text-default-600'
           />
           <input
+            id="fileInput_2"
             type="file"
             accept="image/*"
             onChange={(e) => props.handleChangeInputImage(e, 'image2')}
             className='w-full rounded-medium py-4 px-3 text-tiny bg-default-100 text-default-600'
           />
         </section>
+
+        {(props.getters.previewImageOne || props.getters.previewImageTwo) && (
+          <section className='flex justify-around'>
+            <div className='flex gap-4 items-center'>
+              <Avatar
+                src={props.getters.previewImageOne || noImage.src}
+                className="w-28 h-28 text-large"
+              />
+              <Button
+                isIconOnly
+                color="danger"
+                aria-label="eliminar imagen"
+                onClick={() => props.setters.deleteImage('image')}
+              >
+                <TrashIcon className="h-6 w-6 text-slate-50" />
+              </Button>
+            </div>
+            <div className='flex gap-4 items-center'>
+              <Avatar
+                src={props.getters.previewImageTwo || noImage.src}
+                className="w-28 h-28 text-large"
+              />
+              <Button
+                isIconOnly
+                color="danger"
+                aria-label="eliminar imagen"
+                onClick={() => props.setters.deleteImage('image2')}
+              >
+                <TrashIcon className="h-6 w-6 text-slate-50" />
+              </Button>
+            </div>
+          </section>
+        )}
 
         <section>
           <Editor

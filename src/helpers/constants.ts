@@ -8,6 +8,8 @@ export const categories: TCategories[] = [
   { name: 'Lencería', value: 'lenceria'},
   { name: 'Fetiche', value: 'fetiche'},
   { name: 'Higiene y Protección', value: 'higieneyproteccion'},
+  { name: 'Accesorios', value: 'accesorios'},
+  { name: 'Juegos', value: 'juegos'},
   { name: 'Más', value: 'mas'},
 ]
 
@@ -20,6 +22,7 @@ export const subcategories: TSubcategories = {
     { name: 'Femeninos', value: 'femeninos' },
     { name: 'Anal', value: 'anal' },
     { name: 'Consoladores', value: 'consoladores' },
+    { name: 'Anillos', value: 'anillos' },
   ],
   lubricantes: [
     { name: 'Elegir...', value: 'none' },
@@ -40,6 +43,14 @@ export const subcategories: TSubcategories = {
     { name: 'Disfraces', value: 'disfraces' },
     { name: 'Lencería', value: 'lenceria' },
     { name: 'Fetiche', value: 'fetiche' },
+    { name: 'Calzado', value: 'calzado' },
+    { name: 'Bodys', value: 'bodys' },
+    { name: 'Conjuntos', value: 'conjuntos' },
+    { name: 'Babydoll', value: 'babdydoll' },
+    { name: 'Medias', value: 'medias' },
+    { name: 'Pantys', value: 'pantys' },
+    { name: 'Pijamas', value: 'pijamas' },
+    { name: 'Enterizos', value: 'enterizos' },
   ],
   fetiche: [
     { name: 'Elegir...', value: 'none' },
@@ -65,6 +76,14 @@ export const subcategories: TSubcategories = {
   mas: [
     { name: 'Elegir...', value: 'none' },
     { name: 'Potenciadores', value: 'potenciadores' },
+  ],
+  accesorios: [
+    { name: 'Elegir...', value: 'none' },
+    { name: 'General', value: 'general' },
+  ],
+  juegos: [
+    { name: 'Elegir...', value: 'none' },
+    { name: 'General', value: 'general' },
   ],
 }
 

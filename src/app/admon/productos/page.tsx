@@ -41,16 +41,36 @@ const Productos = () => {
   const { data: session } = useSession()
   const [image, setImage] = useState<File | null>(null)
   const { enqueueSnackbar } = useSnackbar()
+  const [previewImageOne, setPreviewImageOne] = useState<string>('')
+  const [previewImageTwo, setPreviewImageTwo] = useState<string>('')
   const [secondImage, setSecondImage] = useState<File | null>(null)
   const [secondCategory,setSecondCategory] = useState<string>('none')
   const [category, setCategory] = useState<string>('none')
   const [currentTab, setCurrentTab] = useState<string>('create')
+
+  const deleteImage = (key: string) => {
+    let input: HTMLInputElement | null;
+    if (key === 'image') {
+      setImage(null);
+      setPreviewImageOne('');
+      input = document.getElementById('fileInput_1') as HTMLInputElement;
+    } else {
+      setSecondImage(null);
+      setPreviewImageTwo('')
+      input = document.getElementById('fileInput_2') as HTMLInputElement;
+    }
+
+    if (input) {
+      input.value = '';
+    }
+  }
 
   const setters = {
     setCategory,
     setSecondCategory,
     setImage,
     setSecondImage,
+    deleteImage,
   }
 
   const [editorState, setEditorState] = useState(
@@ -65,6 +85,8 @@ const Productos = () => {
     secondImage,
     editorState,
     secondCategory,
+    previewImageOne,
+    previewImageTwo,
   }
 
   type TKeys = 'categoria' | 'subcategoria' | 'categoriaDos' | 'subcategoriaDos';
@@ -102,14 +124,31 @@ const Productos = () => {
     setValue('detalles', detallesValue);
   }
 
+  const readFile = (file: File, field: string) => {
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+      if (e.target?.result) {
+        const result = e.target.result as string;
+        field === 'image' ? setPreviewImageOne(result) : setPreviewImageTwo(result);
+      }
+    };
+
+    reader.onerror = (e) => console.log(reader.error);
+
+    reader.readAsDataURL(file);
+  };
+
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>, key: string) => {
     const file = e.target.files && e.target.files[0];
 
     if (file)
       if (key === 'image') {
         setImage(file);
+        readFile(file, 'image')
       } else {
         setSecondImage(file)
+        readFile(file, 'image2')
       }
   };
 
