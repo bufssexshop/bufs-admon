@@ -125,8 +125,10 @@ const ProductsList = () => {
       aria-label="Tabla de productos"
       classNames={{
         base: 'dark',
-        table: "dark min-h-[200px]",
-        tbody: 'dark text-white'
+        table: "dark",
+        tbody: 'dark text-white',
+        tr: 'hover:bg-default',
+        td: 'first:rounded-l-lg last:rounded-r-lg'
       }}
       topContent={topContent}
       bottomContent={bottomContent}

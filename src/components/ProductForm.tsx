@@ -190,7 +190,7 @@ const ProductForm = (props: any) => {
 
         <section className="flex justify-end gap-10">
           <Button type='reset' variant="bordered" color="default">Descartar</Button>
-          <Button type='submit' color="primary">Guardar</Button>
+          <Button isLoading={props.getters.loading} type='submit' color="primary">Guardar</Button>
         </section>
       </form>
     </article>

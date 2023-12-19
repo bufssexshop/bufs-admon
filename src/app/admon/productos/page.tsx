@@ -65,14 +65,6 @@ const Productos = () => {
     }
   }
 
-  const setters = {
-    setCategory,
-    setSecondCategory,
-    setImage,
-    setSecondImage,
-    deleteImage,
-  }
-
   const [editorState, setEditorState] = useState(
     () => EditorState.createEmpty(),
   )
@@ -153,10 +145,9 @@ const Productos = () => {
   };
 
   const createProduct = async (formData: FormValues) => {
-    console.log('xxx formData: ', formData)
 
     const {
-      codigo, nombre, precio, detalles, promocion,
+      codigo, nombre, precio, promocion,
       valorPromocion, categoria, subcategoria, precioCredito,
       disponible, categoriaDos, subcategoriaDos,
     } = formData;
@@ -176,24 +167,27 @@ const Productos = () => {
     data.append('subcategoriaDos', subcategoriaDos)
 
 
-    // if(file) {
-    //   data.append('image', file[0], file[0].name)
-    // }
+    if(image) {
+      data.append('image', image, image?.name)
+    }
 
-    // const response = await fetch(
-    //   `${process.env.NEXT_PUBLIC_API_URL}/productos/crear`,
-    //   {
-    //     method: "POST",
-    //     body: data,
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //       authorization: `Bearer ${session?.user?.token}`,
-    //     },
-    //   }
-    // )
+    if(secondImage) {
+      data.append('image2', secondImage, secondImage?.name)
+    }
 
-    // const res = await response.json()
-    // return res as TResponseData
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/productos/crear`,
+      {
+        method: "POST",
+        body: data,
+        headers: {
+          authorization: `Bearer ${session?.user?.token}`,
+        },
+      }
+    )
+
+    const res = await response.json()
+    return res as TResponseData
 
   }
 
@@ -208,10 +202,18 @@ const Productos = () => {
   })
 
   const onSubmit = (formValues: FormValues) => createProductMutation.mutate(formValues)
-  console.log('xxx errors: ', errors)
 
   const handleSelectChange = (key: React.Key): any => setCurrentTab(String(key))
   const handleChangeSwitch = (value: boolean): any => setValue('disponible', value);
+
+  const setters = {
+    setCategory,
+    setSecondCategory,
+    setImage,
+    setSecondImage,
+    deleteImage,
+    loading: createProductMutation.isPending,
+  }
 
   return (
     <section className="p-10 w-full min-h-screen flex flex-col items-center gap-10">
@@ -242,7 +244,7 @@ const Productos = () => {
           setters={setters}
           getters={getters}
           register={register}
-          onSubmit={createProduct}
+          onSubmit={onSubmit}
           handleSubmit={handleSubmit}
           onEditorChange={onEditorStateChange}
           handleChangeSwitch={handleChangeSwitch}

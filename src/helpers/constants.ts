@@ -9,7 +9,7 @@ export const categories: TCategories[] = [
   { name: 'Fetiche', value: 'fetiche'},
   { name: 'Higiene y Protección', value: 'higieneyproteccion'},
   { name: 'Accesorios', value: 'accesorios'},
-  { name: 'Juegos', value: 'juegos'},
+  { name: 'Potenciadores', value: 'potenciadores'},
   { name: 'Más', value: 'mas'},
 ]
 
@@ -22,7 +22,10 @@ export const subcategories: TSubcategories = {
     { name: 'Femeninos', value: 'femeninos' },
     { name: 'Anal', value: 'anal' },
     { name: 'Consoladores', value: 'consoladores' },
-    { name: 'Anillos', value: 'anillos' },
+    { name: 'Anillos vibradores', value: 'anillos' },
+    { name: 'Control remoto', value: 'controlRemoto' },
+    { name: 'Interactivos', value: 'interactivos' },
+    { name: 'Juegos de mesa', value: 'juegosMesa' },
   ],
   lubricantes: [
     { name: 'Elegir...', value: 'none' },
@@ -81,9 +84,10 @@ export const subcategories: TSubcategories = {
     { name: 'Elegir...', value: 'none' },
     { name: 'General', value: 'general' },
   ],
-  juegos: [
+  potenciadores: [
     { name: 'Elegir...', value: 'none' },
-    { name: 'General', value: 'general' },
+    { name: 'Masculinos', value: 'masculinos' },
+    { name: 'Femeninos', value: 'femeninos' },
   ],
 }
 

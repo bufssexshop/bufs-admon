@@ -10,8 +10,6 @@ type TProps = {
 }
 
 const ClientProviders = ({ children }: TProps) => {
-  console.log('ClientProviders')
-
   return (
     <NextUIProvider>
       <SessionAuthProvider>
