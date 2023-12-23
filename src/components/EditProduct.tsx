@@ -6,18 +6,19 @@ import noImage from '../../public/noImageAvailable.png'
 import { categories, subcategories } from '@/helpers/constants'
 import { Avatar, Button, Input, Select, SelectItem, Switch } from "@nextui-org/react"
 import { TrashIcon } from '@heroicons/react/24/solid'
+import { useRouter } from 'next/navigation'
 const Editor = dynamic(() => import('react-draft-wysiwyg').then((mod) => mod.Editor), { ssr: false })
 
 type TItems = { name: string, value: string }
 
-const ProductForm = (props: any) => {
-
-  const [doubleCategory, setDoubleCategory] = useState<boolean>(false)
+const EditProductForm = (props: any) => {
+  const router = useRouter()
+  const [doubleCategory, setDoubleCategory] = useState<boolean>(props.getters.formValues.categoriaDos !== 'none')
 
   return (
-    <article className="bg-slate-900 dark p-10 rounded-md lg:w-2/4 mb-10">
-      <form onSubmit={props.handleSubmit(props.onSubmit)} className="flex flex-col gap-10 relative">
-        <p className="text-white font-bold text-xl pb-10 text-center">Crear Producto</p>
+    <article className="bg-slate-900 dark p-10 rounded-md lg:w-2/4">
+      <form onSubmit={props.onSubmit} className="flex flex-col gap-10 relative">
+        <p className="text-white font-bold text-xl pb-10 text-center">Editar Producto</p>
         <section className="absolute right-0 top-0 flex flex-col gap-2">
           <Switch
             size="sm"
@@ -25,6 +26,7 @@ const ProductForm = (props: any) => {
             defaultSelected
             aria-label="Disponible"
             onValueChange={props.handleChangeSwitch}
+            value={props.getters.formValues.disponible}
             {...props.register('disponible')}
           >
             Disponible
@@ -37,12 +39,16 @@ const ProductForm = (props: any) => {
           <Input
             type="text"
             label="Código"
+            value={props?.getters?.formValues?.codigo}
             errorMessage={props?.errors?.codigo?.message}
+            defaultValue={props.getters.defaultValues.codigo}
             {...props.register('codigo')}
           />
           <Input
             type="text"
             label="Nombre"
+            value={props.getters.formValues.nombre}
+            defaultValue={props.getters.defaultValues.nombre}
             errorMessage={props?.errors?.nombre?.message}
             {...props.register('nombre')}
           />
@@ -52,12 +58,16 @@ const ProductForm = (props: any) => {
           <Input
             type="text"
             label="Precio"
+            value={props.getters.formValues.precio}
+            defaultValue={props.getters.defaultValues.precio}
             errorMessage={props?.errors?.precio?.message}
             {...props.register('precio')}
           />
           <Input
             type="text"
             label="Precio a crédito"
+            value={props.getters.formValues.precioCredito}
+            defaultValue={props.getters.defaultValues.precioCredito}
             {...props.register('precioCredito')}
           />
         </section>
@@ -70,6 +80,7 @@ const ProductForm = (props: any) => {
             onChange={(e) => props.handleChangeSelector(e, 'categoria')}
             fullWidth
             errorMessage={props?.errors?.categoria?.message}
+            selectedKeys={[props.getters.formValues.categoria]}
           >
             {categories.map(({ name, value }: TItems) => (
               <SelectItem key={value} value={value}>
@@ -83,6 +94,7 @@ const ProductForm = (props: any) => {
             className="max-w-md"
             fullWidth
             onChange={(e) => props.handleChangeSelector(e, 'subcategoria')}
+            selectedKeys={[props.getters.formValues.subcategoria]}
             errorMessage={props?.errors?.subcategoria?.message}
           >
             {props.getters.category === 'none' ? (
@@ -104,6 +116,7 @@ const ProductForm = (props: any) => {
               label="Seleccione la categoría dos"
               className="max-w-md"
               onChange={(e) => props.handleChangeSelector(e, 'categoriaDos')}
+              selectedKeys={[props.getters.formValues.categoriaDos]}
             >
               {categories.map(({ name, value }: TItems) => (
                 <SelectItem key={value} value={value}>
@@ -116,6 +129,7 @@ const ProductForm = (props: any) => {
               label="Seleccione la subcategoría dos"
               className="max-w-md"
               onChange={(e) => props.handleChangeSelector(e, 'subcategoriaDos')}
+              selectedKeys={[props.getters.formValues.subcategoriaDos]}
             >
               {props.getters.secondCategory === 'none' ? (
                 <SelectItem key='none' value='none'>
@@ -189,7 +203,7 @@ const ProductForm = (props: any) => {
         </section>
 
         <section className="flex justify-end gap-10">
-          <Button type='reset' variant="bordered" color="default">Descartar</Button>
+          <Button onClick={() => router.push('/admon/productos/buscar')} variant="bordered" color="default">Descartar</Button>
           <Button isLoading={props.getters.loading} type='submit' color="primary">Guardar</Button>
         </section>
       </form>
@@ -197,4 +211,4 @@ const ProductForm = (props: any) => {
   )
 }
 
-export default ProductForm
+export default EditProductForm

@@ -4,10 +4,11 @@ import React, { useState } from "react";
 import { useSnackbar } from "notistack";
 import { useSession } from "next-auth/react"
 import { useMutation } from '@tanstack/react-query'
-import {Table, Input, TableHeader, TableColumn, TableBody, TableRow, TableCell, getKeyValue, Spinner, Button, Switch, Tooltip} from "@nextui-org/react";
+import {Table, Input, TableHeader, TableColumn, TableBody, TableRow, TableCell, Button, Switch, Tooltip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure} from "@nextui-org/react";
 import { EyeIcon } from "@/SVG/EyeIcon";
 import { EditIcon } from "@/SVG/EditIcon";
 import { DeleteIcon } from "@/SVG/DeleteIcon";
+import { useRouter } from "next/navigation";
 
 type TData = {
   search: string,
@@ -34,14 +35,16 @@ type TResponseData = {
   subcategoriaDos: string;
 };
 
-
 const SearchProductsList = () => {
+  const router = useRouter()
   const { data: session } = useSession()
+  const [id, setId] = useState<string>('')
   const { enqueueSnackbar } = useSnackbar()
-  const [isSelected, setIsSelected] = useState<boolean>(true);
+  const {isOpen, onOpen, onOpenChange} = useDisclosure()
+  const [isSelected, setIsSelected] = useState<boolean>(true)
 
   const [search, setSearch] = useState<string>('lubricantes');
-  const [productsList, setProductsList] = useState<TResponseData[]>([]);
+  const [productsList, setProductsList] = useState<TResponseData[]>([])
 
   const data: TData = {
     search: search,
@@ -121,6 +124,8 @@ const SearchProductsList = () => {
       );
     }
 
+    const goTo = (path: string) => router.push(path);
+
     return (
       <TableBody>
         {productsList.map((row) => (
@@ -143,6 +148,7 @@ const SearchProductsList = () => {
                 </Tooltip>
                 <Tooltip delay={0} closeDelay={0} content="Editar">
                   <span
+                    onClick={() => goTo(`/admon/productos/editar/${row._id}`)}
                     className="text-lg text-default-400 cursor-pointer active:opacity-50"
                   >
                     <EditIcon />
@@ -150,7 +156,10 @@ const SearchProductsList = () => {
                 </Tooltip>
                 <Tooltip delay={0} closeDelay={0} color="danger" content="Eliminar">
                   <span
-                    onClick={() => deleteProductMutation.mutate(row._id)}
+                    onClick={() => {
+                      onOpen()
+                      setId(row._id)
+                    }}
                     className="text-lg text-danger cursor-pointer active:opacity-50"
                   >
                     <DeleteIcon />
@@ -214,12 +223,52 @@ const SearchProductsList = () => {
           <TableColumn key="active" allowsSorting>
             Activo
           </TableColumn>
-          <TableColumn key="active" allowsSorting>
+          <TableColumn key="actions" allowsSorting>
             Acciones
           </TableColumn>
         </TableHeader>
         {CustomTableBody()}
       </Table>
+
+      <Modal
+        backdrop="opaque"
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        classNames={{
+          backdrop: "bg-gradient-to-t from-zinc-900 to-zinc-900/10 backdrop-opacity-20"
+        }}
+      >
+        <ModalContent className="dark text-white">
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">¿Eliminar producto?</ModalHeader>
+              <ModalBody className="text-white">
+                <p>
+                  <span className="text-danger">Eliminar Producto: </span>
+                  ¿Estás seguro de que deseas eliminar este producto? Esta acción no se puede deshacer.
+                </p>
+                <p>
+                  <span>Cancelar y Cerrar: </span>
+                  Si decides no realizar ninguna acción, simplemente haz clic en &quot;Cancelar&quot; para cerrar este modal sin efectuar cambios.
+                </p>
+              </ModalBody>
+              <ModalFooter>
+                <Button
+                  color="danger"
+                  onPress={() => {
+                    deleteProductMutation.mutate(id)
+                    onClose()
+                  }}>
+                  Eliminar
+                </Button>
+                <Button color="default" variant="bordered" onPress={onClose}>
+                  Cancelar
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </>
   );
 }

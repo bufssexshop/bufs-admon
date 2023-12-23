@@ -65,7 +65,7 @@ const Login = () => {
   return (
     <div className='
       flex
-      w-full h-screen
+      w-full min-h-screen
       justify-center items-center
       bg-gradient-to-r from-blue-950 to-fuchsia-950
       '

@@ -7,7 +7,7 @@ type TProps = {
 
 export default function DashboardLayout ({ children }: TProps) {
   return (
-    <section className=' bg-slate-800'>
+    <section className=' bg-slate-800 min-h-screen'>
       <Navbar />
       {children}
       <Footer />

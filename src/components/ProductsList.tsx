@@ -11,6 +11,7 @@ type TProduct = {
   codigo: string;
   nombre: string;
   precio: number;
+  precioCredito: number;
   promocion: boolean;
   valorPromocion: number;
   detalles: string;
@@ -18,12 +19,14 @@ type TProduct = {
   subcategoria: string;
   disponible: boolean;
   image: string;
+  image2: string;
   createdAt: string;
   updatedAt: string;
-  __v: number;
   pictureId: string;
+  pictureId2: string;
   categoriaDos: string;
   subcategoriaDos: string;
+  __v: number;
 };
 
 type TResponse = {

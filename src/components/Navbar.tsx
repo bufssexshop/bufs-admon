@@ -34,7 +34,7 @@ const NavigationBar = () => {
           <Link
             underline={pathname === '/admon/productos' ? 'always' : 'none'}
             color={pathname === '/admon/productos' ? undefined : 'foreground'}
-            href="/admon/productos"
+            href="/admon/productos/buscar"
           >
             Productos
           </Link>
