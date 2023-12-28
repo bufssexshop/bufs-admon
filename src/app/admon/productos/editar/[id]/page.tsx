@@ -1,15 +1,16 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useSnackbar } from 'notistack'
 import draftToHtml from 'draftjs-to-html'
 import { useSession } from "next-auth/react"
-import { useQuery, useMutation } from '@tanstack/react-query'
 import { EditorState, ContentState, convertFromHTML, convertToRaw } from 'draft-js';
-import EditProductForm from '@/components/EditProduct'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css"
-import 'draft-js/dist/Draft.css'
+import EditProductForm from '@/components/EditProduct'
 import { CircularProgress } from '@nextui-org/react'
+import { updateProduct } from '@/api/api'
+import 'draft-js/dist/Draft.css'
 
 type TProduct = {
   _id: string
@@ -49,6 +50,7 @@ const initialValues = {
 
 const EditProduct = ({ params }: { params: { id: string }}) => {
   const { id: productId } = params
+  const queryClient = useQueryClient();
 
   const getProductData = async () => {
     const response = await fetch(
@@ -166,8 +168,14 @@ const EditProduct = ({ params }: { params: { id: string }}) => {
   }
 
   const handleCategorySelectionChange = (e: React.ChangeEvent<HTMLSelectElement>, key: string) => {
-    if (key === 'category') setCategory(e.target.value)
-    else setSecondCategory(e.target.value)
+    if (key === 'category') {
+      setCategory(e.target.value)
+      setSubcategory('none')
+    }
+    else {
+      setSecondCategory(e.target.value)
+      setSecondSubcategory('none')
+    }
   };
 
   const handleSubcategorySelectionChange = (e: React.ChangeEvent<HTMLSelectElement>, key: string) => {
@@ -200,7 +208,9 @@ const EditProduct = ({ params }: { params: { id: string }}) => {
       })
   })
 
-  const onSubmit = () => editProductMutation.mutate()
+  const onSubmit = useCallback(() => {
+    editProductMutation.mutate()
+  }, [editProductMutation])
 
   const onEditorStateChange = (newEditorState: EditorState) => {
     setEditorState(newEditorState);
@@ -235,40 +245,24 @@ const EditProduct = ({ params }: { params: { id: string }}) => {
   }
 
   const editProductRequest = async () => {
-    const data = new FormData()
-      data.append('_id', productId)
-      data.append('codigo', code)
-      data.append('nombre', name)
-      data.append('precio', price.toString())
-      data.append('detalles', details)
-      data.append('categoria', category)
-      data.append('disponible', available.toString())
-      data.append('subcategoria', subcategory)
-      data.append('precioCredito', creditPrice.toString())
-      data.append('categoriaDos', secondCategory)
-      data.append('subcategoriaDos', secondSubcategory)
-
-    if (image && image.size > 0) {
-      data.append('image', image, image.name);
+    const product = {
+      _id: productId,
+      codigo: code,
+      nombre: name,
+      precio: price,
+      detalles: details,
+      categoria: category,
+      disponible: available,
+      subcategoria: subcategory,
+      precioCredito: creditPrice,
+      categoriaDos: secondCategory,
+      subcategoriaDos: secondSubcategory,
+      image: image,
+      image2: secondImage
     }
 
-    if (secondImage && secondImage.size > 0) {
-      data.append('image2', secondImage, secondImage.name);
-    }
-
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/productos/updateProduct`,
-      {
-        method: "POST",
-        body: data,
-        headers: {
-          authorization: `Bearer ${session?.user?.token}`,
-        },
-      }
-    )
-
-    const res = await response.json()
-    return res as TResponseData
+    const response = await updateProduct(product, (session?.user?.token || ''))
+    if (response.message === 'success') queryClient.invalidateQueries({ queryKey: ['product']});
 
   }
 
