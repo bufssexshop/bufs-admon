@@ -1,14 +1,14 @@
 'use client'
 
-import React, { useState } from "react";
-import { useSnackbar } from "notistack";
+import React, { useState } from "react"
+import { useSnackbar } from "notistack"
 import { useSession } from "next-auth/react"
 import { useMutation } from '@tanstack/react-query'
-import {Table, Input, TableHeader, TableColumn, TableBody, TableRow, TableCell, Button, Switch, Tooltip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure} from "@nextui-org/react";
-import { EyeIcon } from "@/SVG/EyeIcon";
-import { EditIcon } from "@/SVG/EditIcon";
-import { DeleteIcon } from "@/SVG/DeleteIcon";
-import { useRouter } from "next/navigation";
+import {Table, Input, TableHeader, TableColumn, TableBody, TableRow, TableCell, Button, Switch, Tooltip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure} from "@nextui-org/react"
+import { EyeIcon } from "@/SVG/EyeIcon"
+import { EditIcon } from "@/SVG/EditIcon"
+import { DeleteIcon } from "@/SVG/DeleteIcon"
+import { useRouter } from "next/navigation"
 
 type TData = {
   search: string,
@@ -16,24 +16,24 @@ type TData = {
 }
 
 type TResponseData = {
-  _id: string;
-  codigo: string;
-  nombre: string;
-  precio: number;
-  promocion: boolean;
-  valorPromocion: number;
-  detalles: string;
-  categoria: string;
-  subcategoria: string;
-  disponible: boolean;
-  image: string;
-  createdAt: string;
-  updatedAt: string;
-  __v: number;
-  pictureId: string;
-  categoriaDos: string;
-  subcategoriaDos: string;
-};
+  _id: string
+  codigo: string
+  nombre: string
+  precio: number
+  promocion: boolean
+  valorPromocion: number
+  detalles: string
+  categoria: string
+  subcategoria: string
+  disponible: boolean
+  image: string
+  createdAt: string
+  updatedAt: string
+  __v: number
+  pictureId: string
+  categoriaDos: string
+  subcategoriaDos: string
+}
 
 const SearchProductsList = () => {
   const router = useRouter()
@@ -43,7 +43,7 @@ const SearchProductsList = () => {
   const {isOpen, onOpen, onOpenChange} = useDisclosure()
   const [isSelected, setIsSelected] = useState<boolean>(true)
 
-  const [search, setSearch] = useState<string>('lubricantes');
+  const [search, setSearch] = useState<string>('lubricantes')
   const [productsList, setProductsList] = useState<TResponseData[]>([])
 
   const data: TData = {
@@ -111,7 +111,7 @@ const SearchProductsList = () => {
     }
   })
 
-  const { isPending } = searchProductsMutation;
+  const { isPending } = searchProductsMutation
 
   const onSearch = () => searchProductsMutation.mutate(data)
 
@@ -121,10 +121,10 @@ const SearchProductsList = () => {
         <TableBody emptyContent="No hay productos para mostrar.">
           {[]}
         </TableBody>
-      );
+      )
     }
 
-    const goTo = (path: string) => router.push(path);
+    const goTo = (path: string) => router.push(path)
 
     return (
       <TableBody>
@@ -170,8 +170,8 @@ const SearchProductsList = () => {
           </TableRow>
         ))}
       </TableBody>
-    );
-  };
+    )
+  }
 
   return (
     <>
@@ -249,7 +249,7 @@ const SearchProductsList = () => {
                 </p>
                 <p>
                   <span>Cancelar y Cerrar: </span>
-                  Si decides no realizar ninguna acción, simplemente haz clic en &quot;Cancelar&quot; para cerrar este modal sin efectuar cambios.
+                  Si decides no realizar ninguna acción, simplemente haz clic en &quotCancelar&quot para cerrar este modal sin efectuar cambios.
                 </p>
               </ModalBody>
               <ModalFooter>
@@ -270,7 +270,7 @@ const SearchProductsList = () => {
         </ModalContent>
       </Modal>
     </>
-  );
+  )
 }
 
 export default SearchProductsList

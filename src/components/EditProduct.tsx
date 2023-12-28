@@ -1,23 +1,76 @@
 'use client'
 
-import { useState } from 'react'
+import React, { ChangeEvent, ChangeEventHandler, useState } from 'react'
 import dynamic from 'next/dynamic'
 import noImage from '../../public/noImageAvailable.png'
 import { categories, subcategories } from '@/helpers/constants'
-import { Avatar, Button, Input, Select, SelectItem, Switch } from "@nextui-org/react"
+import { Avatar, Button, Input, Select, SelectItem, Selection, Switch } from "@nextui-org/react"
 import { TrashIcon } from '@heroicons/react/24/solid'
 import { useRouter } from 'next/navigation'
+import { EditorState } from 'draft-js'
 const Editor = dynamic(() => import('react-draft-wysiwyg').then((mod) => mod.Editor), { ssr: false })
 
 type TItems = { name: string, value: string }
 
-const EditProductForm = (props: any) => {
+type TProps = {
+  onEditorChange: (editorState: EditorState) => void,
+  setters: {
+    setAvailable: (isSelected: boolean) => void,
+    setCode: React.Dispatch<React.SetStateAction<string>>,
+    setName: React.Dispatch<React.SetStateAction<string>>,
+    setPrice: React.Dispatch<React.SetStateAction<number>>,
+    setCreditPrice: React.Dispatch<React.SetStateAction<number>>,
+    handleCategorySelectionChange: (e: React.ChangeEvent<HTMLSelectElement>, key: string) => void,
+    handleSubcategorySelectionChange: (e: React.ChangeEvent<HTMLSelectElement>, key: string) => void,
+    setImage: React.Dispatch<React.SetStateAction<File | null>>,
+    setSecondImage: React.Dispatch<React.SetStateAction<File | null>>,
+    deleteImage: (key: string) => void,
+  },
+  getters: {
+    available: boolean,
+    code: string,
+    name: string,
+    price: number,
+    creditPrice: number,
+    category: string,
+    subcategory: string,
+    secondCategory: string,
+    secondSubcategory: string,
+    image: File | null,
+    secondImage: File,
+    editorState: EditorState,
+    previewImageOne: string,
+    previewImageTwo: string,
+    loading: boolean,
+  },
+  defaultValues: {
+    disponible: boolean,
+    codigo: string,
+    nombre: string,
+    precio: number,
+    precioCredito: number,
+    categoria: string,
+    subcategoria: string,
+    categoriaDos: string,
+    subcategoriaDos: string,
+    image: string,
+    image2: string,
+  }
+  onSubmit: () => void,
+  handleChangeInputImage: (e: ChangeEvent<HTMLInputElement>, key: string) => void
+  reset: () => void,
+}
+
+const EditProductForm = (props: TProps) => {
   const router = useRouter()
-  const [doubleCategory, setDoubleCategory] = useState<boolean>(props.getters.formValues.categoriaDos !== 'none')
+  const { setters, getters, onSubmit, onEditorChange, defaultValues } = props
+  const { setCode, setName, setPrice, setCreditPrice, setAvailable } = setters
+  const [doubleCategory, setDoubleCategory] = useState<boolean>(getters.secondCategory !== 'none')
+  console.log('xxx getters: ', getters);
 
   return (
     <article className="bg-slate-900 dark p-10 rounded-md lg:w-2/4">
-      <form onSubmit={props.onSubmit} className="flex flex-col gap-10 relative">
+      <form className="flex flex-col gap-10 relative">
         <p className="text-white font-bold text-xl pb-10 text-center">Editar Producto</p>
         <section className="absolute right-0 top-0 flex flex-col gap-2">
           <Switch
@@ -25,9 +78,8 @@ const EditProductForm = (props: any) => {
             color="success"
             defaultSelected
             aria-label="Disponible"
-            onValueChange={props.handleChangeSwitch}
-            value={props.getters.formValues.disponible}
-            {...props.register('disponible')}
+            value={getters.available.toString()}
+            onValueChange={setAvailable}
           >
             Disponible
           </Switch>
@@ -39,48 +91,41 @@ const EditProductForm = (props: any) => {
           <Input
             type="text"
             label="Código"
-            value={props?.getters?.formValues?.codigo}
-            errorMessage={props?.errors?.codigo?.message}
-            defaultValue={props.getters.defaultValues.codigo}
-            {...props.register('codigo')}
+            defaultValue={defaultValues.codigo}
+            onValueChange={setCode}
           />
           <Input
             type="text"
             label="Nombre"
-            value={props.getters.formValues.nombre}
-            defaultValue={props.getters.defaultValues.nombre}
-            errorMessage={props?.errors?.nombre?.message}
-            {...props.register('nombre')}
+            defaultValue={defaultValues.nombre}
+            onValueChange={setName}
           />
         </section>
 
         <section className=" flex gap-10">
           <Input
-            type="text"
+            type="number"
             label="Precio"
-            value={props.getters.formValues.precio}
-            defaultValue={props.getters.defaultValues.precio}
-            errorMessage={props?.errors?.precio?.message}
-            {...props.register('precio')}
+            defaultValue={defaultValues.precio.toString()}
+            onValueChange={(value: string) => setPrice(value as any)}
           />
           <Input
-            type="text"
+            type="number"
             label="Precio a crédito"
-            value={props.getters.formValues.precioCredito}
-            defaultValue={props.getters.defaultValues.precioCredito}
-            {...props.register('precioCredito')}
+            defaultValue={defaultValues.precioCredito.toString()}
+            onValueChange={(value: string) => setCreditPrice(value as any)}
           />
         </section>
 
         {/* FIRST CATEGORY */}
         <section className="flex gap-10">
           <Select
-            label="Seleccione la categoría"
-            className="max-w-md"
-            onChange={(e) => props.handleChangeSelector(e, 'categoria')}
             fullWidth
-            errorMessage={props?.errors?.categoria?.message}
-            selectedKeys={[props.getters.formValues.categoria]}
+            className="max-w-md"
+            selectionMode="single"
+            label="Seleccione la categoría"
+            onChange={(e) => setters.handleCategorySelectionChange(e, 'category')}
+            selectedKeys={[getters.category]}
           >
             {categories.map(({ name, value }: TItems) => (
               <SelectItem key={value} value={value}>
@@ -90,19 +135,18 @@ const EditProductForm = (props: any) => {
           </Select>
 
           <Select
+            fullWidth
             label="Seleccione la subcategoría"
             className="max-w-md"
-            fullWidth
-            onChange={(e) => props.handleChangeSelector(e, 'subcategoria')}
-            selectedKeys={[props.getters.formValues.subcategoria]}
-            errorMessage={props?.errors?.subcategoria?.message}
+            onChange={(e) => setters.handleSubcategorySelectionChange(e, 'subcategory')}
+            selectedKeys={[getters.subcategory]}
           >
-            {props.getters.category === 'none' ? (
+            {getters.category === 'none' ? (
               <SelectItem key='none' value='none'>
                 Elegir...
               </SelectItem>
-            ) : subcategories[props.getters.category].map(({ name, value }: TItems) => (
-              <SelectItem key={name} value={value}>
+            ) : subcategories[getters.category].map(({ name, value }: TItems) => (
+              <SelectItem key={value} value={value}>
                 {name}
               </SelectItem>
             ))}
@@ -115,8 +159,8 @@ const EditProductForm = (props: any) => {
             <Select
               label="Seleccione la categoría dos"
               className="max-w-md"
-              onChange={(e) => props.handleChangeSelector(e, 'categoriaDos')}
-              selectedKeys={[props.getters.formValues.categoriaDos]}
+              onChange={(e) => setters.handleCategorySelectionChange(e, 'secondCategory')}
+              selectedKeys={[getters.secondCategory]}
             >
               {categories.map(({ name, value }: TItems) => (
                 <SelectItem key={value} value={value}>
@@ -128,15 +172,15 @@ const EditProductForm = (props: any) => {
             <Select
               label="Seleccione la subcategoría dos"
               className="max-w-md"
-              onChange={(e) => props.handleChangeSelector(e, 'subcategoriaDos')}
-              selectedKeys={[props.getters.formValues.subcategoriaDos]}
+              onChange={(e) => setters.handleSubcategorySelectionChange(e, 'secondSubcategory')}
+              selectedKeys={[getters?.secondSubcategory]}
             >
-              {props.getters.secondCategory === 'none' ? (
+              {getters.secondCategory === 'none' ? (
                 <SelectItem key='none' value='none'>
                   Elegir...
                 </SelectItem>
-              ) : subcategories[props.getters.secondCategory].map(({ name, value }: TItems) => (
-                <SelectItem key={name} value={value}>
+              ) : subcategories[getters?.secondCategory].map(({ name, value }: TItems) => (
+                <SelectItem key={value} value={value}>
                   {name}
                 </SelectItem>
               ))}
@@ -161,32 +205,32 @@ const EditProductForm = (props: any) => {
           />
         </section>
 
-        {(props.getters.previewImageOne || props.getters.previewImageTwo) && (
+        {(getters.previewImageOne || getters.previewImageTwo) && (
           <section className='flex justify-around'>
             <div className='flex gap-4 items-center'>
               <Avatar
-                src={props.getters.previewImageOne || noImage.src}
+                src={getters.previewImageOne || noImage.src}
                 className="w-28 h-28 text-large"
               />
               <Button
                 isIconOnly
                 color="danger"
                 aria-label="eliminar imagen"
-                onClick={() => props.setters.deleteImage('image')}
+                onClick={() => setters.deleteImage('image')}
               >
                 <TrashIcon className="h-6 w-6 text-slate-50" />
               </Button>
             </div>
             <div className='flex gap-4 items-center'>
               <Avatar
-                src={props.getters.previewImageTwo || noImage.src}
+                src={getters.previewImageTwo || noImage.src}
                 className="w-28 h-28 text-large"
               />
               <Button
                 isIconOnly
                 color="danger"
                 aria-label="eliminar imagen"
-                onClick={() => props.setters.deleteImage('image2')}
+                onClick={() => setters.deleteImage('image2')}
               >
                 <TrashIcon className="h-6 w-6 text-slate-50" />
               </Button>
@@ -196,15 +240,15 @@ const EditProductForm = (props: any) => {
 
         <section>
           <Editor
-            editorState={props.getters.editorState}
+            editorState={getters.editorState}
             editorClassName="bg-slate-800 text-white rounded-sm"
-            onEditorStateChange={props.onEditorChange}
+            onEditorStateChange={(newState) => onEditorChange(newState)}
           />
         </section>
 
         <section className="flex justify-end gap-10">
           <Button onClick={() => router.push('/admon/productos/buscar')} variant="bordered" color="default">Descartar</Button>
-          <Button isLoading={props.getters.loading} type='submit' color="primary">Guardar</Button>
+          <Button isLoading={getters.loading} onClick={onSubmit} color="primary">Guardar</Button>
         </section>
       </form>
     </article>

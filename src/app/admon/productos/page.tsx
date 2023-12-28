@@ -5,7 +5,7 @@ import { useRouter, usePathname } from "next/navigation"
 const Productos = () => {
   const router = useRouter()
   const pathname = usePathname()
-  const currentPath = pathname.split('/')[3];
+  const currentPath = pathname.split('/')[3]
 
   const ListItem = ({ label, value }: { label: string, value: string }) => {
     return (

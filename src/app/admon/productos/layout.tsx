@@ -1,7 +1,7 @@
 import Component from './page'
 
 type TProps = {
-  children: React.ReactNode;
+  children: React.ReactNode
 }
 
 export default function DashboardLayout ({ children }: TProps) {

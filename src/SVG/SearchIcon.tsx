@@ -1,4 +1,4 @@
-import React from "react";
+import React from "react"
 
 export const SearchIcon = ({
   size = 24,
@@ -32,5 +32,4 @@ export const SearchIcon = ({
       strokeWidth={strokeWidth}
     />
   </svg>
-);
-
+)

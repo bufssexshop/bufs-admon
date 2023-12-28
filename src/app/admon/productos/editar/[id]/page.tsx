@@ -1,59 +1,35 @@
 'use client'
 
-import {ChangeEvent, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useSnackbar } from 'notistack'
 import draftToHtml from 'draftjs-to-html'
-import { useForm } from 'react-hook-form'
 import { useSession } from "next-auth/react"
-import { useQuery } from '@tanstack/react-query'
-import { useMutation } from '@tanstack/react-query'
-import { ContentState, convertFromHTML, convertToRaw, EditorState } from 'draft-js'
-import { joiResolver } from '@hookform/resolvers/joi'
-import { editProductSchema } from '@/helpers/formSchemas'
+import { useQuery, useMutation } from '@tanstack/react-query'
+import { EditorState, ContentState, convertFromHTML, convertToRaw } from 'draft-js';
 import EditProductForm from '@/components/EditProduct'
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css"
-import { CircularProgress, Input } from '@nextui-org/react'
+import 'draft-js/dist/Draft.css'
+import { CircularProgress } from '@nextui-org/react'
 
 type TProduct = {
-  _id: string;
-  codigo: string;
-  nombre: string;
-  precio: number;
-  precioCredito: number;
-  detalles: string;
-  categoria: string;
-  subcategoria: string;
-  disponible: boolean;
-  image: string;
-  image2: string;
-  createdAt: string;
-  updatedAt: string;
-  pictureId: string;
-  pictureId2: string;
-  categoriaDos: string;
-  subcategoriaDos: string;
-  __v: number;
-};
-
-type FormValues = {
+  _id: string
   codigo: string
   nombre: string
-  precio: string
+  precio: number
+  precioCredito: number
   detalles: string
-  promocion: boolean
-  precioCredito: string
-  valorPromocion: string
   categoria: string
   subcategoria: string
+  disponible: boolean
+  image: string
+  image2: string
+  createdAt: string
+  updatedAt: string
+  pictureId: string
+  pictureId2: string
   categoriaDos: string
   subcategoriaDos: string
-  disponible: boolean
 }
-
-const schema = editProductSchema.messages({
-  'any.required': 'Este campo es requerido',
-  'string.empty': 'Este campo es requerido'
-})
 
 type TResponseData = string
 
@@ -81,161 +57,197 @@ const EditProduct = ({ params }: { params: { id: string }}) => {
     queryFn: getProductData,
   })
 
-  const { data, isLoading } = productQuery
+  const { data, isLoading, isFetched } = productQuery
 
-  const productDetails = data?.detalles || '';
-  const blocksFromHTML = convertFromHTML(productDetails)
-  const content = ContentState.createFromBlockArray(
-    blocksFromHTML.contentBlocks,
+  const productDetails = data?.detalles || ''
+  const contentState = ContentState.createFromBlockArray(
+    convertFromHTML(productDetails).contentBlocks
   )
-  // const [editorState, setEditorState] = useState(EditorState.createWithContent(content));
+
+  const initialEditorState = EditorState.createWithContent(contentState);
+  const [editorState, setEditorState] = useState<EditorState>(initialEditorState);
+
+  useEffect(() => {
+    const blocksFromHTML = convertFromHTML(productDetails);
+    const content = ContentState.createFromBlockArray(
+      blocksFromHTML.contentBlocks,
+      blocksFromHTML.entityMap
+    );
+    setEditorState(EditorState.createWithContent(content));
+  }, [productDetails]);
+
+  const getEditorContentAsHTML = () => {
+    const contentState = editorState.getCurrentContent();
+    const rawContentState = convertToRaw(contentState);
+    return draftToHtml(rawContentState);
+  };
 
   const { data: session } = useSession()
   const { enqueueSnackbar } = useSnackbar()
-  const [image, setImage] = useState<File | null>(null)
-  const [category, setCategory] = useState<string>(data?.categoria || 'none')
-  const [secondImage, setSecondImage] = useState<File | null>(null)
-  const [previewImageOne, setPreviewImageOne] = useState<string>(data?.image || '')
-  const [previewImageTwo, setPreviewImageTwo] = useState<string>(data?.image2 || '')
-  const [secondCategory,setSecondCategory] = useState<string>(data?.categoriaDos || 'none')
+  const [code, setCode] = useState<string>('')
+  const [name, setName] = useState<string>('')
+  const [price, setPrice] = useState<number>(data?.precio || 0)
+  const [image, setImage] = useState<File>(new File([], ''))
+  const [secondImage, setSecondImage] = useState<File>(new File([], ''))
+  const [creditPrice, setCreditPrice] = useState<number>(data?.precioCredito || 0)
+  const [category, setCategory] = useState<string>(data?.categoria || '')
+  const [subcategory, setSubcategory] = useState<string>(data?.subcategoria || '')
+  const [secondSubcategory, setSecondSubcategory] = useState<string>(data?.categoriaDos || '')
+  const [secondCategory,setSecondCategory] = useState<string>(data?.subcategoriaDos || '')
+  const [previewImageOne, setPreviewImageOne] = useState<string>('')
+  const [previewImageTwo, setPreviewImageTwo] = useState<string>('')
+  const [available, setAvailable] = useState<boolean>(data?.disponible || true)
 
-  const handleChangeSwitch = (value: boolean): any => setValue('disponible', value)
+  // hay un problema, no cambian los selectors
 
-  const editProductMutation = useMutation({
-    mutationFn: (data: FormValues) => editProductRequest(data),
-    onSuccess: () => {
-      enqueueSnackbar('¡Producto actualizado!', {
-        variant: 'success',
-      })
+  useEffect(() => {
+    if (data) {
+      setCode(data.codigo)
+      setName(data.nombre)
+      setPrice(data.precio)
+      setCreditPrice(data.precioCredito)
+      setCategory(data.categoria)
+      setSubcategory(data.subcategoria)
+      setSecondCategory(data.categoriaDos)
+      setSecondSubcategory(data.subcategoriaDos)
+      setPreviewImageOne(data.image)
+      setPreviewImageTwo(data.image2)
+      setAvailable(data.disponible)
     }
-  })
+  }, [data, productId])
 
-  const submit = (formValues: FormValues) => editProductMutation.mutate(formValues)
-  const onSubmit = () => handleSubmit(submit);
+  const deleteImage = (key: string) => {
+    let input: HTMLInputElement | null
+    if (key === 'image') {
+      setImage(new File([], ''))
+      setPreviewImageOne('')
+      input = document.getElementById('fileInput_1') as HTMLInputElement
+    } else {
+      setSecondImage(new File([], ''))
+      setPreviewImageTwo('')
+      input = document.getElementById('fileInput_2') as HTMLInputElement
+    }
 
-
-  const onEditorStateChange = (editorState: EditorState) =>  {
-    setEditorState(editorState);
-
-    const contentState = convertToRaw(editorState.getCurrentContent());
-    const detallesValue = JSON.stringify(contentState);
-    setValue('detalles', detallesValue);
+    if (input) {
+      input.value = ''
+    }
   }
 
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>, key: string) => {
-    const file = e.target.files && e.target.files[0];
+  const handleCategorySelectionChange = (e: React.ChangeEvent<HTMLSelectElement>, key: string) => {
+    if (key === 'category') setCategory(e.target.value)
+    else setSecondCategory(e.target.value)
+  };
+
+  const handleSubcategorySelectionChange = (e: React.ChangeEvent<HTMLSelectElement>, key: string) => {
+    if (key === 'subcategory') setSubcategory(e.target.value)
+    else setSecondSubcategory(e.target.value)
+  };
+
+  const formValues = {
+    available: data?.disponible ?? false,
+    code: data?.codigo ?? '',
+    name: data?.nombre ?? '',
+    price: data?.precio ? Number(data?.precio) : 0,
+    creditPrice: data?.precioCredito ? Number(data?.precioCredito) : 0,
+    category: data?.categoria ?? '',
+    subcategory: data?.subcategoria ?? '',
+    secondCategory: data?.categoriaDos ?? '',
+    secondSubcategory: data?.subcategoriaDos ?? '',
+    details: data?.detalles ?? '',
+    image,
+    secondImage,
+    editorState: editorState || initialEditorState,
+    previewImageOne: data?.image || '',
+    previewImageTwo: data?.image2 || '',
+    loading: isLoading,
+  }
+
+  const setters: any = {
+    setAvailable,
+    setCode,
+    setName,
+    setPrice,
+    setCreditPrice,
+    handleCategorySelectionChange,
+    handleSubcategorySelectionChange,
+    setImage: setImage as React.Dispatch<React.SetStateAction<File | null>>,
+    setSecondImage,
+    deleteImage
+  }
+
+  const editProductMutation = useMutation({
+    mutationFn: () => editProductRequest(),
+    onSuccess: () =>
+      enqueueSnackbar('¡Producto actualizado!', {
+        variant: 'success',
+      }),
+    onError: (error) =>
+      enqueueSnackbar(`Parece que hubo un error: ${error}`, {
+        variant: 'error',
+      })
+  })
+
+  const onSubmit = () => editProductMutation.mutate()
+
+  const onEditorStateChange = (newEditorState: EditorState) => {
+    setEditorState(newEditorState);
+  };
+
+  const handleFileChange = (e: any, key: string) => {
+    const file = e.target.files && e.target.files[0]
 
     if (file)
       if (key === 'image') {
-        setImage(file);
+        setImage(file)
         readFile(file, 'image')
       } else {
         setSecondImage(file)
         readFile(file, 'image2')
       }
-  };
+  }
 
   const readFile = (file: File, field: string) => {
-    const reader = new FileReader();
+    const reader = new FileReader()
 
     reader.onload = (e) => {
       if (e.target?.result) {
-        const result = e.target.result as string;
-        field === 'image' ? setPreviewImageOne(result) : setPreviewImageTwo(result);
+        const result = e.target.result as string
+        field === 'image' ? setPreviewImageOne(result) : setPreviewImageTwo(result)
       }
-    };
-
-    reader.onerror = (e) => console.log(reader.error);
-
-    reader.readAsDataURL(file);
-  };
-
-  const [editorState, setEditorState] = useState(
-    () => EditorState.createEmpty(),
-  )
-
-  const details = draftToHtml(convertToRaw(editorState.getCurrentContent()));
-
-  const {
-    watch,
-    reset,
-    register,
-    setValue,
-    handleSubmit,
-    formState: { errors, defaultValues }
-  } = useForm<FormValues>({
-    resolver: joiResolver(schema),
-    mode: 'onChange',
-    defaultValues: {
-      codigo: data?.codigo || '',
-      nombre: data?.nombre || '',
-      precio: data?.precio.toString() || '0',
-      precioCredito: data?.precioCredito.toString() ||'',
-      detalles: data?.detalles,
-      categoria: data?.categoria,
-      subcategoria: data?.subcategoria,
-      disponible: data?.disponible,
-      categoriaDos: data?.categoriaDos,
-      subcategoriaDos: data?.subcategoriaDos,
-    },
-  })
-
-  const deleteImage = (key: string) => {
-    let input: HTMLInputElement | null;
-    if (key === 'image') {
-      setImage(null);
-      setPreviewImageOne('');
-      input = document.getElementById('fileInput_1') as HTMLInputElement;
-    } else {
-      setSecondImage(null);
-      setPreviewImageTwo('')
-      input = document.getElementById('fileInput_2') as HTMLInputElement;
     }
 
-    if (input) {
-      input.value = '';
-    }
+    reader.onerror = (e) => console.log(reader.error)
+
+    reader.readAsDataURL(file)
   }
 
-  type TKeys = 'categoria' | 'subcategoria' | 'categoriaDos' | 'subcategoriaDos';
-  const handleSelectionChange = (e: { target: { value: string } }, key: TKeys) => {
-    if (key === 'categoria') setCategory(e.target.value)
-    if (key === 'categoriaDos') setSecondCategory(e.target.value)
-    setValue(key, e.target.value)
-  }
+  const details = getEditorContentAsHTML();
 
-  const editProductRequest = async (formData: FormValues) => {
-    const {
-      codigo, nombre, precio, promocion,
-      valorPromocion, categoria, subcategoria, precioCredito,
-      disponible, categoriaDos, subcategoriaDos,
-    } = formData;
-
+  const editProductRequest = async () => {
     const data = new FormData()
-    data.append('codigo', codigo)
-    data.append('nombre', nombre)
-    data.append('precio', precio)
+    data.append('_id', productId)
+    data.append('codigo', code)
+    data.append('nombre', name)
+    data.append('precio', price.toString())
     data.append('detalles', details)
-    data.append('categoria', categoria)
-    data.append('promocion', promocion.toString())
-    data.append('disponible', disponible.toString())
-    data.append('valorPromocion', valorPromocion)
-    data.append('subcategoria', subcategoria)
-    data.append('precioCredito', precioCredito)
-    data.append('categoriaDos', categoriaDos)
-    data.append('subcategoriaDos', subcategoriaDos)
+    data.append('categoria', category)
+    data.append('disponible', available.toString())
+    data.append('subcategoria', subcategory)
+    data.append('precioCredito', creditPrice.toString())
+    data.append('categoriaDos', secondCategory)
+    data.append('subcategoriaDos', secondSubcategory)
 
 
-    if(image) {
-      data.append('image', image, image?.name)
+    if (image && image.size > 0) {
+      data.append('image', image, image.name);
     }
 
-    if(secondImage) {
-      data.append('image2', secondImage, secondImage?.name)
+    if (secondImage && secondImage.size > 0) {
+      data.append('image2', secondImage, secondImage.name);
     }
 
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/productos//updateProductWithOutPicture`,
+      `${process.env.NEXT_PUBLIC_API_URL}/productos/updateProduct`,
       {
         method: "POST",
         body: data,
@@ -250,49 +262,27 @@ const EditProduct = ({ params }: { params: { id: string }}) => {
 
   }
 
-  const setters = {
-    setCategory,
-    setSecondCategory,
-    setImage,
-    setSecondImage,
-    deleteImage
-  }
-
-  const getters = {
-    image,
-    category,
-    secondImage,
-    editorState,
-    secondCategory,
-    previewImageOne,
-    previewImageTwo,
-    loading: false,
-    defaultValues,
-    formValues: data,
-  }
-
   const clearForm = () => {
-    reset()
     deleteImage('image')
     deleteImage('image2')
   }
 
+  console.log('xxx category: ', category);
+  console.log('xxx subcategory: ', subcategory);
+
   return (
-    (!!data && !isLoading) ? (
+    (!isLoading && isFetched && !!data) ? (
       <EditProductForm
         setters={setters}
-        getters={getters}
-        register={register}
+        getters={formValues}
+        defaultValues={data}
         onSubmit={onSubmit}
         onEditorChange={onEditorStateChange}
-        handleChangeSwitch={handleChangeSwitch}
-        handleChangeSelector={handleSelectionChange}
         handleChangeInputImage={handleFileChange}
         reset={clearForm}
-        errors={errors}
       />
     ) : (
-      <CircularProgress label="Cargando..." />
+      <CircularProgress className='dark text-white' label="Cargando..." />
     )
   )
 }

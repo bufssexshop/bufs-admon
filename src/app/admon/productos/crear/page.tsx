@@ -49,46 +49,46 @@ const CreateProduct = () => {
 
 
   const onEditorStateChange = (editorState: EditorState) =>  {
-    setEditorState(editorState);
+    setEditorState(editorState)
 
-    const contentState = convertToRaw(editorState.getCurrentContent());
-    const detallesValue = JSON.stringify(contentState);
-    setValue('detalles', detallesValue);
+    const contentState = convertToRaw(editorState.getCurrentContent())
+    const detallesValue = JSON.stringify(contentState)
+    setValue('detalles', detallesValue)
   }
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>, key: string) => {
-    const file = e.target.files && e.target.files[0];
+    const file = e.target.files && e.target.files[0]
 
     if (file)
       if (key === 'image') {
-        setImage(file);
+        setImage(file)
         readFile(file, 'image')
       } else {
         setSecondImage(file)
         readFile(file, 'image2')
       }
-  };
+  }
 
   const readFile = (file: File, field: string) => {
-    const reader = new FileReader();
+    const reader = new FileReader()
 
     reader.onload = (e) => {
       if (e.target?.result) {
-        const result = e.target.result as string;
-        field === 'image' ? setPreviewImageOne(result) : setPreviewImageTwo(result);
+        const result = e.target.result as string
+        field === 'image' ? setPreviewImageOne(result) : setPreviewImageTwo(result)
       }
-    };
+    }
 
-    reader.onerror = (e) => console.log(reader.error);
+    reader.onerror = (e) => console.log(reader.error)
 
-    reader.readAsDataURL(file);
-  };
+    reader.readAsDataURL(file)
+  }
 
   const [editorState, setEditorState] = useState(
     () => EditorState.createEmpty(),
   )
 
-  const details = draftToHtml(convertToRaw(editorState.getCurrentContent()));
+  const details = draftToHtml(convertToRaw(editorState.getCurrentContent()))
 
   const defaultValues = {
     disponible: true,
@@ -97,9 +97,10 @@ const CreateProduct = () => {
     precioCredito: '0',
     categoriaDos: 'none',
     subcategoriaDos: 'none'
-  };
+  }
 
   const {
+    watch,
     reset,
     register,
     setValue,
@@ -111,25 +112,29 @@ const CreateProduct = () => {
     defaultValues,
   })
 
+  console.log('xxx subcategoria: ', watch('subcategoria'))
+
   const deleteImage = (key: string) => {
-    let input: HTMLInputElement | null;
+    let input: HTMLInputElement | null
     if (key === 'image') {
-      setImage(null);
-      setPreviewImageOne('');
-      input = document.getElementById('fileInput_1') as HTMLInputElement;
+      setImage(null)
+      setPreviewImageOne('')
+      input = document.getElementById('fileInput_1') as HTMLInputElement
     } else {
-      setSecondImage(null);
+      setSecondImage(null)
       setPreviewImageTwo('')
-      input = document.getElementById('fileInput_2') as HTMLInputElement;
+      input = document.getElementById('fileInput_2') as HTMLInputElement
     }
 
     if (input) {
-      input.value = '';
+      input.value = ''
     }
   }
 
-  type TKeys = 'categoria' | 'subcategoria' | 'categoriaDos' | 'subcategoriaDos';
+  type TKeys = 'categoria' | 'subcategoria' | 'categoriaDos' | 'subcategoriaDos'
   const handleSelectionChange = (e: { target: { value: string } }, key: TKeys) => {
+    console.log('xxx e.target.value: ', e.target.value)
+
     if (key === 'categoria') setCategory(e.target.value)
     if (key === 'categoriaDos') setSecondCategory(e.target.value)
     setValue(key, e.target.value)
@@ -141,7 +146,7 @@ const CreateProduct = () => {
       codigo, nombre, precio, promocion,
       valorPromocion, categoria, subcategoria, precioCredito,
       disponible, categoriaDos, subcategoriaDos,
-    } = formData;
+    } = formData
 
     const data = new FormData()
     data.append('codigo', codigo)

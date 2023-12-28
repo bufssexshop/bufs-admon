@@ -8,7 +8,7 @@ import { Avatar, Button, Input, Select, SelectItem, Switch } from "@nextui-org/r
 import { TrashIcon } from '@heroicons/react/24/solid'
 const Editor = dynamic(() => import('react-draft-wysiwyg').then((mod) => mod.Editor), { ssr: false })
 
-type TItems = { name: string, value: string }
+type TItems = { id: string, name: string, value: string }
 
 const ProductForm = (props: any) => {
 
@@ -89,8 +89,8 @@ const ProductForm = (props: any) => {
               <SelectItem key='none' value='none'>
                 Elegir...
               </SelectItem>
-            ) : subcategories[props.getters.category].map(({ name, value }: TItems) => (
-              <SelectItem key={name} value={value}>
+            ) : subcategories[props.getters.category].map(({ id, name, value }: TItems) => (
+              <SelectItem key={value} value={value}>
                 {name}
               </SelectItem>
             ))}
@@ -105,7 +105,7 @@ const ProductForm = (props: any) => {
               className="max-w-md"
               onChange={(e) => props.handleChangeSelector(e, 'categoriaDos')}
             >
-              {categories.map(({ name, value }: TItems) => (
+              {categories.map(({ id, name, value }: TItems) => (
                 <SelectItem key={value} value={value}>
                   {name}
                 </SelectItem>
@@ -121,8 +121,8 @@ const ProductForm = (props: any) => {
                 <SelectItem key='none' value='none'>
                   Elegir...
                 </SelectItem>
-              ) : subcategories[props.getters.secondCategory].map(({ name, value }: TItems) => (
-                <SelectItem key={name} value={value}>
+              ) : subcategories[props.getters.secondCategory].map(({ id, name, value }: TItems) => (
+                <SelectItem key={value} value={value}>
                   {name}
                 </SelectItem>
               ))}

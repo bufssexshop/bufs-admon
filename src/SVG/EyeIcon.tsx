@@ -24,4 +24,4 @@ export const EyeIcon = (props: any) => (
       strokeWidth={1.5}
     />
   </svg>
-);
+)

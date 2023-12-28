@@ -1,33 +1,33 @@
 'use client'
 
-import React, { useEffect, useMemo, useState } from "react";
-import { useSnackbar } from "notistack";
+import React, { useEffect, useMemo, useState } from "react"
+import { useSnackbar } from "notistack"
 import { useSession } from "next-auth/react"
 import { useQuery } from '@tanstack/react-query'
-import {Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination, Button} from "@nextui-org/react";
+import {Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination, Button} from "@nextui-org/react"
 
 type TProduct = {
-  _id: string;
-  codigo: string;
-  nombre: string;
-  precio: number;
-  precioCredito: number;
-  promocion: boolean;
-  valorPromocion: number;
-  detalles: string;
-  categoria: string;
-  subcategoria: string;
-  disponible: boolean;
-  image: string;
-  image2: string;
-  createdAt: string;
-  updatedAt: string;
-  pictureId: string;
-  pictureId2: string;
-  categoriaDos: string;
-  subcategoriaDos: string;
-  __v: number;
-};
+  _id: string
+  codigo: string
+  nombre: string
+  precio: number
+  precioCredito: number
+  promocion: boolean
+  valorPromocion: number
+  detalles: string
+  categoria: string
+  subcategoria: string
+  disponible: boolean
+  image: string
+  image2: string
+  createdAt: string
+  updatedAt: string
+  pictureId: string
+  pictureId2: string
+  categoriaDos: string
+  subcategoriaDos: string
+  __v: number
+}
 
 type TResponse = {
   products: TProduct[]
@@ -44,9 +44,9 @@ type TResponse = {
 
 const ProductsList = () => {
   const { data: session } = useSession()
-  const [page, setPage] = useState<number>(1);
-  const [rowsPerPage, setRowsPerPage] = useState<number>(10);
-  const [productsInfo, setProductsInfo] = useState<TResponse>();
+  const [page, setPage] = useState<number>(1)
+  const [rowsPerPage, setRowsPerPage] = useState<number>(10)
+  const [productsInfo, setProductsInfo] = useState<TResponse>()
 
 
   const searchProducts = async () => {
@@ -71,16 +71,16 @@ const ProductsList = () => {
   })
 
   useEffect(() => {
-    const { data } = getProductsQuery;
+    const { data } = getProductsQuery
     if (data) {
-      setProductsInfo(data as TResponse);
+      setProductsInfo(data as TResponse)
     }
-  }, [getProductsQuery]);
+  }, [getProductsQuery])
 
-  const onRowsPerPageChange = React.useCallback((e: { target: { value: any; }; }) => {
-    setRowsPerPage(Number(e.target.value));
-    setPage(1);
-  }, []);
+  const onRowsPerPageChange = React.useCallback((e: { target: { value: any } }) => {
+    setRowsPerPage(Number(e.target.value))
+    setPage(1)
+  }, [])
 
   const topContent = React.useMemo(() => {
     return (
@@ -104,8 +104,8 @@ const ProductsList = () => {
           </label>
         </div>
       </div>
-    );
-  }, [onRowsPerPageChange, productsInfo]);
+    )
+  }, [onRowsPerPageChange, productsInfo])
 
   const bottomContent = useMemo(() => {
     return (
@@ -173,7 +173,7 @@ const ProductsList = () => {
         ))}
       </TableBody>
     </Table>
-  );
+  )
 }
 
 export default ProductsList

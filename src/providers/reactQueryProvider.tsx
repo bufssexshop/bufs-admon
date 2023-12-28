@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
@@ -9,12 +8,10 @@ type TProps = {
 }
 
 function Providers ({ children }: TProps) {
-  const [client] = useState(
-    new QueryClient({ defaultOptions: { queries: { staleTime: 5000 } } })
-  )
+  const queryClient = new QueryClient()
 
   return (
-    <QueryClientProvider client={client}>
+    <QueryClientProvider client={queryClient}>
       {children}
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
