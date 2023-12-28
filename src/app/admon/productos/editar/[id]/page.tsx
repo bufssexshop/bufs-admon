@@ -86,45 +86,63 @@ const EditProduct = ({ params }: { params: { id: string }}) => {
   const { enqueueSnackbar } = useSnackbar()
   const [code, setCode] = useState<string>('')
   const [name, setName] = useState<string>('')
-  const [price, setPrice] = useState<number>(data?.precio || 0)
+  const [price, setPrice] = useState<number>(0)
   const [image, setImage] = useState<File>(new File([], ''))
   const [secondImage, setSecondImage] = useState<File>(new File([], ''))
-  const [creditPrice, setCreditPrice] = useState<number>(data?.precioCredito || 0)
-  const [category, setCategory] = useState<string>(data?.categoria || '')
-  const [subcategory, setSubcategory] = useState<string>(data?.subcategoria || '')
-  const [secondSubcategory, setSecondSubcategory] = useState<string>(data?.categoriaDos || '')
-  const [secondCategory,setSecondCategory] = useState<string>(data?.subcategoriaDos || '')
+  const [creditPrice, setCreditPrice] = useState<number>(0)
+  const [category, setCategory] = useState<string>()
+  const [subcategory, setSubcategory] = useState<string>('')
+  const [secondSubcategory, setSecondSubcategory] = useState<string>('')
+  const [secondCategory,setSecondCategory] = useState<string>('')
   const [previewImageOne, setPreviewImageOne] = useState<string>('')
   const [previewImageTwo, setPreviewImageTwo] = useState<string>('')
-  const [available, setAvailable] = useState<boolean>(data?.disponible || true)
+  const [available, setAvailable] = useState<boolean>(true)
 
-  // hay un problema, no cambian los selectors
+  const [formValid, setFormValid] = useState<boolean>(false)
+
+  const validateForm = () => {
+    return !!(code && name && price
+      && category && subcategory && secondCategory && secondSubcategory
+      && details && (previewImageOne || previewImageTwo))
+  }
+
+  const details = getEditorContentAsHTML();
 
   useEffect(() => {
-    if (data) {
-      setCode(data.codigo)
-      setName(data.nombre)
-      setPrice(data.precio)
-      setCreditPrice(data.precioCredito)
-      setCategory(data.categoria)
-      setSubcategory(data.subcategoria)
-      setSecondCategory(data.categoriaDos)
-      setSecondSubcategory(data.subcategoriaDos)
-      setPreviewImageOne(data.image)
-      setPreviewImageTwo(data.image2)
-      setAvailable(data.disponible)
+    if(!isLoading && isFetched && data) {
+      setFormValid(validateForm());
     }
-  }, [data, productId])
+  }, [isLoading, isFetched, data, code, name, price,
+     category, subcategory, secondCategory, secondSubcategory,
+     details, previewImageOne, previewImageTwo])
+
+  const setAllstatesFormData = (product: TProduct) => {
+    setAvailable(product.disponible)
+    setCode(product.codigo)
+    setName(product.nombre)
+    setPrice(product.precio)
+    setCreditPrice(product.precioCredito)
+    setCategory(product.categoria)
+    setSubcategory(product.subcategoria)
+    setSecondCategory(product.categoriaDos)
+    setSecondSubcategory(product.subcategoriaDos)
+    setPreviewImageOne(product.image)
+    setPreviewImageTwo(product.image2)
+  }
+
+  useEffect(() => {
+    if (data) setAllstatesFormData(data)
+  }, [data])
 
   const deleteImage = (key: string) => {
     let input: HTMLInputElement | null
     if (key === 'image') {
       setImage(new File([], ''))
-      setPreviewImageOne('')
+      setPreviewImageOne(data?.image || '')
       input = document.getElementById('fileInput_1') as HTMLInputElement
     } else {
       setSecondImage(new File([], ''))
-      setPreviewImageTwo('')
+      setPreviewImageTwo(data?.image2 || '')
       input = document.getElementById('fileInput_2') as HTMLInputElement
     }
 
@@ -142,25 +160,6 @@ const EditProduct = ({ params }: { params: { id: string }}) => {
     if (key === 'subcategory') setSubcategory(e.target.value)
     else setSecondSubcategory(e.target.value)
   };
-
-  const formValues = {
-    available: data?.disponible ?? false,
-    code: data?.codigo ?? '',
-    name: data?.nombre ?? '',
-    price: data?.precio ? Number(data?.precio) : 0,
-    creditPrice: data?.precioCredito ? Number(data?.precioCredito) : 0,
-    category: data?.categoria ?? '',
-    subcategory: data?.subcategoria ?? '',
-    secondCategory: data?.categoriaDos ?? '',
-    secondSubcategory: data?.subcategoriaDos ?? '',
-    details: data?.detalles ?? '',
-    image,
-    secondImage,
-    editorState: editorState || initialEditorState,
-    previewImageOne: data?.image || '',
-    previewImageTwo: data?.image2 || '',
-    loading: isLoading,
-  }
 
   const setters: any = {
     setAvailable,
@@ -221,8 +220,6 @@ const EditProduct = ({ params }: { params: { id: string }}) => {
     reader.readAsDataURL(file)
   }
 
-  const details = getEditorContentAsHTML();
-
   const editProductRequest = async () => {
     const data = new FormData()
     data.append('_id', productId)
@@ -267,11 +264,27 @@ const EditProduct = ({ params }: { params: { id: string }}) => {
     deleteImage('image2')
   }
 
-  console.log('xxx category: ', category);
-  console.log('xxx subcategory: ', subcategory);
+  const formValues = {
+    available,
+    code,
+    name,
+    price,
+    creditPrice,
+    category,
+    subcategory,
+    secondCategory,
+    secondSubcategory,
+    details,
+    image,
+    secondImage,
+    editorState: editorState || initialEditorState,
+    previewImageOne,
+    previewImageTwo,
+    loading: isLoading,
+  }
 
   return (
-    (!isLoading && isFetched && !!data) ? (
+    (formValid) ? (
       <EditProductForm
         setters={setters}
         getters={formValues}

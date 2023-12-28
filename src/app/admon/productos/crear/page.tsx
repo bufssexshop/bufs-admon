@@ -112,8 +112,6 @@ const CreateProduct = () => {
     defaultValues,
   })
 
-  console.log('xxx subcategoria: ', watch('subcategoria'))
-
   const deleteImage = (key: string) => {
     let input: HTMLInputElement | null
     if (key === 'image') {
@@ -133,7 +131,6 @@ const CreateProduct = () => {
 
   type TKeys = 'categoria' | 'subcategoria' | 'categoriaDos' | 'subcategoriaDos'
   const handleSelectionChange = (e: { target: { value: string } }, key: TKeys) => {
-    console.log('xxx e.target.value: ', e.target.value)
 
     if (key === 'categoria') setCategory(e.target.value)
     if (key === 'categoriaDos') setSecondCategory(e.target.value)

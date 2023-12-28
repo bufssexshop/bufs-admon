@@ -36,7 +36,7 @@ type TProps = {
     subcategory: string,
     secondCategory: string,
     secondSubcategory: string,
-    image: File | null,
+    image: File,
     secondImage: File,
     editorState: EditorState,
     previewImageOne: string,
@@ -66,7 +66,6 @@ const EditProductForm = (props: TProps) => {
   const { setters, getters, onSubmit, onEditorChange, defaultValues } = props
   const { setCode, setName, setPrice, setCreditPrice, setAvailable } = setters
   const [doubleCategory, setDoubleCategory] = useState<boolean>(getters.secondCategory !== 'none')
-  console.log('xxx getters: ', getters);
 
   return (
     <article className="bg-slate-900 dark p-10 rounded-md lg:w-2/4">
@@ -76,9 +75,8 @@ const EditProductForm = (props: TProps) => {
           <Switch
             size="sm"
             color="success"
-            defaultSelected
             aria-label="Disponible"
-            value={getters.available.toString()}
+            isSelected={getters.available}
             onValueChange={setAvailable}
           >
             Disponible
@@ -124,6 +122,7 @@ const EditProductForm = (props: TProps) => {
             className="max-w-md"
             selectionMode="single"
             label="Seleccione la categoría"
+            disabledKeys={[getters.category]}
             onChange={(e) => setters.handleCategorySelectionChange(e, 'category')}
             selectedKeys={[getters.category]}
           >
@@ -136,9 +135,11 @@ const EditProductForm = (props: TProps) => {
 
           <Select
             fullWidth
-            label="Seleccione la subcategoría"
             className="max-w-md"
+            selectionMode="single"
+            label="Seleccione la subcategoría"
             onChange={(e) => setters.handleSubcategorySelectionChange(e, 'subcategory')}
+            disabledKeys={[getters.subcategory]}
             selectedKeys={[getters.subcategory]}
           >
             {getters.category === 'none' ? (
@@ -157,9 +158,11 @@ const EditProductForm = (props: TProps) => {
         {doubleCategory && (
           <section className=" flex gap-10">
             <Select
-              label="Seleccione la categoría dos"
               className="max-w-md"
+              selectionMode="single"
+              label="Seleccione la categoría dos"
               onChange={(e) => setters.handleCategorySelectionChange(e, 'secondCategory')}
+              disabledKeys={[getters.secondCategory]}
               selectedKeys={[getters.secondCategory]}
             >
               {categories.map(({ name, value }: TItems) => (
@@ -170,9 +173,11 @@ const EditProductForm = (props: TProps) => {
             </Select>
 
             <Select
-              label="Seleccione la subcategoría dos"
               className="max-w-md"
+              selectionMode="single"
+              label="Seleccione la subcategoría dos"
               onChange={(e) => setters.handleSubcategorySelectionChange(e, 'secondSubcategory')}
+              disabledKeys={[getters?.secondSubcategory]}
               selectedKeys={[getters?.secondSubcategory]}
             >
               {getters.secondCategory === 'none' ? (
@@ -216,6 +221,7 @@ const EditProductForm = (props: TProps) => {
                 isIconOnly
                 color="danger"
                 aria-label="eliminar imagen"
+                isDisabled={getters.image.size <= 0}
                 onClick={() => setters.deleteImage('image')}
               >
                 <TrashIcon className="h-6 w-6 text-slate-50" />
@@ -230,6 +236,7 @@ const EditProductForm = (props: TProps) => {
                 isIconOnly
                 color="danger"
                 aria-label="eliminar imagen"
+                isDisabled={getters.secondImage.size <= 0}
                 onClick={() => setters.deleteImage('image2')}
               >
                 <TrashIcon className="h-6 w-6 text-slate-50" />
