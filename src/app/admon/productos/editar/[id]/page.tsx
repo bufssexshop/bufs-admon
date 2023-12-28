@@ -33,6 +33,20 @@ type TProduct = {
 
 type TResponseData = string
 
+const initialValues = {
+  disponible: false,
+  codigo: '',
+  nombre: '',
+  precio: 0,
+  precioCredito: 0,
+  categoria: 'none',
+  subcategoria: 'none',
+  categoriaDos: 'none',
+  subcategoriaDos: 'none',
+  image: '',
+  image2: '',
+}
+
 const EditProduct = ({ params }: { params: { id: string }}) => {
   const { id: productId } = params
 
@@ -90,7 +104,7 @@ const EditProduct = ({ params }: { params: { id: string }}) => {
   const [image, setImage] = useState<File>(new File([], ''))
   const [secondImage, setSecondImage] = useState<File>(new File([], ''))
   const [creditPrice, setCreditPrice] = useState<number>(0)
-  const [category, setCategory] = useState<string>()
+  const [category, setCategory] = useState<string>('none')
   const [subcategory, setSubcategory] = useState<string>('')
   const [secondSubcategory, setSecondSubcategory] = useState<string>('')
   const [secondCategory,setSecondCategory] = useState<string>('')
@@ -222,18 +236,17 @@ const EditProduct = ({ params }: { params: { id: string }}) => {
 
   const editProductRequest = async () => {
     const data = new FormData()
-    data.append('_id', productId)
-    data.append('codigo', code)
-    data.append('nombre', name)
-    data.append('precio', price.toString())
-    data.append('detalles', details)
-    data.append('categoria', category)
-    data.append('disponible', available.toString())
-    data.append('subcategoria', subcategory)
-    data.append('precioCredito', creditPrice.toString())
-    data.append('categoriaDos', secondCategory)
-    data.append('subcategoriaDos', secondSubcategory)
-
+      data.append('_id', productId)
+      data.append('codigo', code)
+      data.append('nombre', name)
+      data.append('precio', price.toString())
+      data.append('detalles', details)
+      data.append('categoria', category)
+      data.append('disponible', available.toString())
+      data.append('subcategoria', subcategory)
+      data.append('precioCredito', creditPrice.toString())
+      data.append('categoriaDos', secondCategory)
+      data.append('subcategoriaDos', secondSubcategory)
 
     if (image && image.size > 0) {
       data.append('image', image, image.name);
@@ -288,7 +301,7 @@ const EditProduct = ({ params }: { params: { id: string }}) => {
       <EditProductForm
         setters={setters}
         getters={formValues}
-        defaultValues={data}
+        defaultValues={data ?? initialValues}
         onSubmit={onSubmit}
         onEditorChange={onEditorStateChange}
         handleChangeInputImage={handleFileChange}
