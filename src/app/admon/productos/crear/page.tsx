@@ -39,10 +39,12 @@ const CreateProduct = () => {
   const { enqueueSnackbar } = useSnackbar()
   const [image, setImage] = useState<File | null>(null)
   const [category, setCategory] = useState<string>('none')
+  const [subcategory, setSubcategory] = useState<string>('none')
   const [secondImage, setSecondImage] = useState<File | null>(null)
   const [previewImageOne, setPreviewImageOne] = useState<string>('')
   const [previewImageTwo, setPreviewImageTwo] = useState<string>('')
-  const [secondCategory,setSecondCategory] = useState<string>('none')
+  const [secondCategory, setSecondCategory] = useState<string>('none')
+  const [secondSubcategory, setSecondSubcategory] = useState<string>('none')
 
   const handleChangeSwitch = (value: boolean): any => setValue('disponible', value)
   const onSubmit = (formValues: FormValues) => createProductMutation.mutate(formValues)
@@ -100,7 +102,6 @@ const CreateProduct = () => {
   }
 
   const {
-    watch,
     reset,
     register,
     setValue,
@@ -129,13 +130,31 @@ const CreateProduct = () => {
     }
   }
 
-  type TKeys = 'categoria' | 'subcategoria' | 'categoriaDos' | 'subcategoriaDos'
-  const handleSelectionChange = (e: { target: { value: string } }, key: TKeys) => {
+  type TKeys = 'categoria' | 'subcategoria' | 'categoriaDos' | 'subcategoriaDos';
 
-    if (key === 'categoria') setCategory(e.target.value)
-    if (key === 'categoriaDos') setSecondCategory(e.target.value)
-    setValue(key, e.target.value)
-  }
+  const handleSelectionChange = (e: { target: { value: string } }, key: TKeys) => {
+    const value = e.target.value
+
+    const handlers: Record<TKeys, () => void> = {
+      'categoria': () => {
+        setCategory(value)
+        setSubcategory('none')
+      },
+      'categoriaDos': () => {
+        setSecondCategory(value)
+        setSecondSubcategory('none')
+      },
+      'subcategoria': () => setSubcategory(value),
+      'subcategoriaDos': () => setSecondSubcategory(value),
+    };
+
+    const setValueFunction = handlers[key]
+    if (setValueFunction) {
+      setValueFunction()
+      setValue(key, value)
+    }
+  };
+
 
   const createProduct = async (formData: FormValues) => {
 
@@ -206,18 +225,14 @@ const CreateProduct = () => {
   const getters = {
     image,
     category,
+    subcategory,
     secondImage,
     editorState,
     secondCategory,
+    secondSubcategory,
     previewImageOne,
     previewImageTwo,
     loading: isPending,
-  }
-
-  const clearForm = () => {
-    reset()
-    deleteImage('image')
-    deleteImage('image2')
   }
 
   return (

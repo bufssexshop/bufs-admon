@@ -65,11 +65,13 @@ const ProductForm = (props: any) => {
         {/* FIRST CATEGORY */}
         <section className="flex gap-10">
           <Select
-            label="Seleccione la categoría"
-            className="max-w-md"
-            onChange={(e) => props.handleChangeSelector(e, 'categoria')}
             fullWidth
+            className="max-w-md"
+            label="Seleccione la categoría"
+            onChange={(e) => props.handleChangeSelector(e, 'categoria')}
             errorMessage={props?.errors?.categoria?.message}
+            selectedKeys={[props?.getters?.category]}
+            disabledKeys={[props?.getters?.category]}
           >
             {categories.map(({ name, value }: TItems) => (
               <SelectItem key={value} value={value}>
@@ -79,11 +81,13 @@ const ProductForm = (props: any) => {
           </Select>
 
           <Select
-            label="Seleccione la subcategoría"
-            className="max-w-md"
             fullWidth
+            className="max-w-md"
+            label="Seleccione la subcategoría"
             onChange={(e) => props.handleChangeSelector(e, 'subcategoria')}
             errorMessage={props?.errors?.subcategoria?.message}
+            selectedKeys={[props?.getters?.subcategory]}
+            disabledKeys={[props?.getters?.subcategory]}
           >
             {props.getters.category === 'none' ? (
               <SelectItem key='none' value='none'>
@@ -101,9 +105,11 @@ const ProductForm = (props: any) => {
         {doubleCategory && (
           <section className=" flex gap-10">
             <Select
-              label="Seleccione la categoría dos"
               className="max-w-md"
+              label="Seleccione la categoría dos"
               onChange={(e) => props.handleChangeSelector(e, 'categoriaDos')}
+              selectedKeys={[props?.getters?.secondCategory]}
+              disabledKeys={[props?.getters?.secondCategory]}
             >
               {categories.map(({ name, value }: TItems) => (
                 <SelectItem key={value} value={value}>
@@ -113,9 +119,11 @@ const ProductForm = (props: any) => {
             </Select>
 
             <Select
-              label="Seleccione la subcategoría dos"
               className="max-w-md"
+              label="Seleccione la subcategoría dos"
               onChange={(e) => props.handleChangeSelector(e, 'subcategoriaDos')}
+              selectedKeys={[props?.getters?.secondSubcategory]}
+              disabledKeys={[props?.getters?.secondSubcategory]}
             >
               {props.getters.secondCategory === 'none' ? (
                 <SelectItem key='none' value='none'>
