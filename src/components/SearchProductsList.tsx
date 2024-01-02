@@ -148,7 +148,7 @@ const SearchProductsList = () => {
                 </Tooltip>
                 <Tooltip delay={0} closeDelay={0} content="Editar">
                   <span
-                    onClick={() => goTo(`/admon/productos/editar/${row._id}`)}
+                    onClick={() => window.open(`/admon/productos/editar/${row._id}`, '_blank')}
                     className="text-lg text-default-400 cursor-pointer active:opacity-50"
                   >
                     <EditIcon />
