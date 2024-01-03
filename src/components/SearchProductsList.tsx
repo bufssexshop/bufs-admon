@@ -9,6 +9,7 @@ import { EyeIcon } from "@/SVG/EyeIcon"
 import { EditIcon } from "@/SVG/EditIcon"
 import { DeleteIcon } from "@/SVG/DeleteIcon"
 import { useRouter } from "next/navigation"
+import { handleSessionExpiration } from "@/helpers/handleSessionExpiration"
 
 type TData = {
   search: string,
@@ -65,6 +66,7 @@ const SearchProductsList = () => {
     )
 
     const res = await response.json()
+    handleSessionExpiration(res, enqueueSnackbar);
     return res as TResponseData[]
   }
 

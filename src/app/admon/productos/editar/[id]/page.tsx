@@ -11,6 +11,7 @@ import EditProductForm from '@/components/EditProduct'
 import { CircularProgress } from '@nextui-org/react'
 import { updateProduct } from '@/api/api'
 import 'draft-js/dist/Draft.css'
+import { handleSessionExpiration } from '@/helpers/handleSessionExpiration'
 
 type TProduct = {
   _id: string
@@ -65,6 +66,7 @@ const EditProduct = ({ params }: { params: { id: string }}) => {
     )
 
     const res = await response.json()
+    handleSessionExpiration(res, enqueueSnackbar)
     return res as TProduct
   }
 

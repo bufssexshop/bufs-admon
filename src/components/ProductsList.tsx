@@ -1,10 +1,11 @@
 'use client'
 
 import React, { useEffect, useMemo, useState } from "react"
-import { useSnackbar } from "notistack"
+import { enqueueSnackbar, useSnackbar } from "notistack"
 import { useSession } from "next-auth/react"
 import { useQuery } from '@tanstack/react-query'
 import {Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination, Button} from "@nextui-org/react"
+import { handleSessionExpiration } from "@/helpers/handleSessionExpiration"
 
 type TProduct = {
   _id: string
@@ -62,6 +63,7 @@ const ProductsList = () => {
     )
 
     const res = await response.json()
+    handleSessionExpiration(res, enqueueSnackbar)
     return res as TResponse
   }
 

@@ -6,6 +6,8 @@ import {Button, Card, CardFooter, CircularProgress} from "@nextui-org/react"
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
 import {Image} from "@nextui-org/react"
 import { Pie } from 'react-chartjs-2'
+import { useSnackbar } from "notistack"
+import { handleSessionExpiration } from "@/helpers/handleSessionExpiration"
 
 ChartJS.register(ArcElement, Tooltip, Legend)
 
@@ -50,6 +52,7 @@ type TResponseData = {
 
 const Dashboard = () => {
   const { data: session } = useSession()
+  const { enqueueSnackbar } = useSnackbar()
 
   const getIndicators = async () => {
     const response = await fetch(
@@ -64,6 +67,7 @@ const Dashboard = () => {
     )
 
     const data = await response.json()
+    handleSessionExpiration(data, enqueueSnackbar)
     return data as TResponseData
   }
 
