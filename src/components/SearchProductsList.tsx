@@ -1,15 +1,21 @@
 'use client'
 
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { useSnackbar } from "notistack"
 import { useSession } from "next-auth/react"
 import { useMutation } from '@tanstack/react-query'
-import {Table, Input, TableHeader, TableColumn, TableBody, TableRow, TableCell, Button, Switch, Tooltip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure} from "@nextui-org/react"
 import { EyeIcon } from "@/SVG/EyeIcon"
 import { EditIcon } from "@/SVG/EditIcon"
 import { DeleteIcon } from "@/SVG/DeleteIcon"
 import { useRouter } from "next/navigation"
 import { handleSessionExpiration } from "@/helpers/handleSessionExpiration"
+
+import {
+  Table, Input, TableHeader, TableColumn, TableBody,
+  TableRow, TableCell, Button, Switch, Tooltip, Modal,
+  ModalContent, ModalHeader, ModalBody, ModalFooter,
+  useDisclosure
+} from "@nextui-org/react"
 
 type TData = {
   search: string,
@@ -42,6 +48,7 @@ const SearchProductsList = () => {
   const [id, setId] = useState<string>('')
   const { enqueueSnackbar } = useSnackbar()
   const {isOpen, onOpen, onOpenChange} = useDisclosure()
+  const channel = new BroadcastChannel('productsChannel')
   const [isSelected, setIsSelected] = useState<boolean>(true)
 
   const [search, setSearch] = useState<string>('lubricantes')
@@ -116,6 +123,19 @@ const SearchProductsList = () => {
   const { isPending } = searchProductsMutation
 
   const onSearch = () => searchProductsMutation.mutate(data)
+
+  useEffect(() => {
+    const handleUpdateProductsList = () => {
+      onSearch();
+    };
+
+    channel.addEventListener('message', handleUpdateProductsList);
+
+    return () => {
+      channel.removeEventListener('message', handleUpdateProductsList);
+    };
+  }, [onSearch]);
+
 
   const CustomTableBody = () => {
     if (!productsList || !Array.isArray(productsList) || productsList.length === 0) {

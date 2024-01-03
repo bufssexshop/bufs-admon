@@ -52,6 +52,7 @@ const initialValues = {
 const EditProduct = ({ params }: { params: { id: string }}) => {
   const { id: productId } = params
   const queryClient = useQueryClient();
+  const channel = new BroadcastChannel('productsChannel')
 
   const getProductData = async () => {
     const response = await fetch(
@@ -200,10 +201,12 @@ const EditProduct = ({ params }: { params: { id: string }}) => {
 
   const editProductMutation = useMutation({
     mutationFn: () => editProductRequest(),
-    onSuccess: () =>
+    onSuccess: () => {
       enqueueSnackbar('¡Producto actualizado!', {
         variant: 'success',
-      }),
+      })
+      channel.postMessage('updateSearchList')
+    },
     onError: (error) =>
       enqueueSnackbar(`Parece que hubo un error: ${error}`, {
         variant: 'error',
@@ -291,6 +294,12 @@ const EditProduct = ({ params }: { params: { id: string }}) => {
     previewImageTwo,
     loading: isLoading,
   }
+
+  useEffect(() => {
+    return () => {
+      channel.close()
+    }
+  }, [])
 
   return (
     (formValid) ? (
