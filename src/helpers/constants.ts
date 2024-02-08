@@ -29,6 +29,7 @@ export const subcategories: TSubcategories = {
     {  name: 'Control remoto', value: 'controlRemoto' },
     {  name: 'Interactivos', value: 'interactivos' },
     {  name: 'Juegos de mesa', value: 'juegosMesa' },
+    {   name: 'Huevos/Balas vibradores', value: 'huevosBalas' }
   ],
   lubricantes: [
     {  name: 'Elegir...', value: 'none' },
