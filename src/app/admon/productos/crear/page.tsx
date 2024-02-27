@@ -1,6 +1,6 @@
 'use client'
 
-import {ChangeEvent, useState } from 'react'
+import {ChangeEvent, useEffect, useState } from 'react'
 import { useSnackbar } from 'notistack'
 import draftToHtml from 'draftjs-to-html'
 import { useForm } from 'react-hook-form'
@@ -11,6 +11,7 @@ import { convertToRaw, EditorState } from 'draft-js'
 import { joiResolver } from '@hookform/resolvers/joi'
 import { productSchema } from '@/helpers/formSchemas'
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css"
+import { handleSessionExpiration } from "@/helpers/handleSessionExpiration"
 
 type FormValues = {
   codigo: string
@@ -45,6 +46,30 @@ const CreateProduct = () => {
   const [previewImageTwo, setPreviewImageTwo] = useState<string>('')
   const [secondCategory, setSecondCategory] = useState<string>('none')
   const [secondSubcategory, setSecondSubcategory] = useState<string>('none')
+
+  const validateAuth = async () => {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/usuarios/auth`,
+      {
+        method: "GET",
+        headers: {
+          authorization: `Bearer ${session?.user?.token}`,
+        },
+      }
+    )
+
+    const res = await response.json()
+    return res as TResponseData
+  }
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const res = await validateAuth();
+      handleSessionExpiration(res, enqueueSnackbar);
+    }
+
+    fetchData();
+  }, [])
 
   const handleChangeSwitch = (value: boolean): any => setValue('disponible', value)
   const onSubmit = (formValues: FormValues) => createProductMutation.mutate(formValues)
@@ -200,7 +225,6 @@ const CreateProduct = () => {
 
     const res = await response.json()
     return res as TResponseData
-
   }
 
   const createProductMutation = useMutation({
