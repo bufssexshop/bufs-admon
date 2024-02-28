@@ -2,6 +2,7 @@ import { signOut } from "next-auth/react"
 
 export const handleSessionExpiration = (response: any, notification: any ) => {
   if (response?.message) {
+    if (response?.message === 'success') return;
     let countDown = 4;
 
     notification(`Lo sentimos, la sesión expiró. Cerrando en 3 segundos.`, {
