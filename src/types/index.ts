@@ -230,3 +230,43 @@ export interface PaginationState {
   itemsPerPage: number;
   totalItems: number;
 }
+
+// ============================================
+// ORDERS
+// ============================================
+export interface OrderItem {
+  productId: string;
+  productName: string;
+  productCode: string;
+  productImage?: string;
+  quantity: number;
+  price: number;
+  subtotal: number;
+}
+
+export interface Order {
+  _id: string;
+  orderNumber: string;
+  userId: string;
+  userName: string;
+  userEmail: string;
+  items: OrderItem[];
+  notes: string;
+  status: 'pending' | 'processing' | 'completed' | 'cancelled';
+  subtotal: number;
+  total: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateOrderRequest {
+  items: OrderItem[];
+  notes?: string;
+}
+
+export const ORDER_STATUS = {
+  pending: { label: 'Pendiente', color: 'bg-yellow-100 text-yellow-700' },
+  processing: { label: 'En Proceso', color: 'bg-blue-100 text-blue-700' },
+  completed: { label: 'Completado', color: 'bg-green-100 text-green-700' },
+  cancelled: { label: 'Cancelado', color: 'bg-red-100 text-red-700' },
+} as const;

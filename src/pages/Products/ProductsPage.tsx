@@ -53,8 +53,8 @@ export function ProductsPage() {
     navigate(`/productos/${product._id}/editar`);
   };
 
-  const handleViewProduct = () => {
-    toast.info('Vista de detalle próximamente');
+  const handleViewProduct = (product: Product) => {
+    navigate(`/productos/${product._id}`);
   };
 
   const handleDeleteProduct = () => {

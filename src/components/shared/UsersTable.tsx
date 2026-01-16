@@ -1,4 +1,4 @@
-import { MoreVertical, Pencil, Trash2, User as UserIcon } from "lucide-react";
+import { Eye, MoreVertical, Pencil, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,9 +22,10 @@ interface UsersTableProps {
   users: User[];
   onEdit: (user: User) => void;
   onDelete: (user: User) => void;
+  onView: (user: User) => void;
 }
 
-export function UsersTable({ users, onEdit, onDelete }: UsersTableProps) {
+export function UsersTable({ users, onView, onEdit, onDelete }: UsersTableProps) {
   const getRoleBadgeColor = (role: User['role']) => {
     switch (role) {
       case 'admin':
@@ -106,6 +107,10 @@ export function UsersTable({ users, onEdit, onDelete }: UsersTableProps) {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => onView(user)}>
+                      <Eye className="mr-2 h-4 w-4" />
+                      Ver
+                    </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => onEdit(user)}>
                       <Pencil className="mr-2 h-4 w-4" />
                       Editar

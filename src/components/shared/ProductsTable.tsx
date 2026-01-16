@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/table";
 import type { Product } from "@/types";
 import { useAuth } from "@/contexts/AuthContext";
+import { AddToCartButton } from "./AddToCartButton";
 
 interface ProductsTableProps {
   products: Product[];
@@ -132,14 +133,18 @@ export function ProductsTable({
                     </DropdownMenuContent>
                   </DropdownMenu>
                 ) : (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8"
-                    onClick={() => onView(product)}
-                  >
-                    <Eye className="h-4 w-4" />
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={() => onView(product)}
+                      title="Ver detalles"
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                    <AddToCartButton product={product} size="sm" />
+                  </div>
                 )}
               </TableCell>
             </TableRow>

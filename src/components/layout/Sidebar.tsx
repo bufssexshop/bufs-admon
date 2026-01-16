@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { LayoutDashboard, Package, Users, Settings, LogOut } from "lucide-react";
+import { LayoutDashboard, Package, Users, Settings, LogOut, ShoppingBag, ClipboardList } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
@@ -26,11 +26,23 @@ export function Sidebar({ onNavigate }: SidebarProps) {
       href: "/productos",
       icon: Package,
     },
-    ...(isAdmin ? [{
-      title: "Usuarios",
-      href: "/usuarios",
-      icon: Users,
+    ...(!isAdmin ? [{
+      title: "Mis Pedidos",
+      href: "/mis-pedidos",
+      icon: ShoppingBag,
     }] : []),
+    ...(isAdmin ? [
+      {
+        title: "Pedidos",
+        href: "/pedidos",
+        icon: ClipboardList,
+      },
+      {
+        title: "Usuarios",
+        href: "/usuarios",
+        icon: Users,
+      }
+    ] : []),
     {
       title: "Perfil",
       href: "/perfil",

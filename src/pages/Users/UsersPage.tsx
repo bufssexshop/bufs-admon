@@ -40,6 +40,10 @@ export function UsersPage() {
       user.email.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const handleViewUser = (user: User) => {
+    navigate(`/usuarios/${user._id}`);
+  };
+
   const handleCreateUser = () => {
     navigate('/usuarios/nuevo');
   };
@@ -88,6 +92,7 @@ export function UsersPage() {
           users={filteredUsers}
           onEdit={handleEditUser}
           onDelete={setUserToDelete}
+          onView={handleViewUser}
         />
       )}
 

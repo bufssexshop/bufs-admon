@@ -23,6 +23,17 @@ interface ProductFormProps {
   isLoading?: boolean;
 }
 
+interface FormErrors {
+  code?: string;
+  name?: string;
+  price?: string;
+  creditPrice?: string;
+  details?: string;
+  category?: string;
+  subcategory?: string;
+  image?: string;
+}
+
 const defaultFormData: ProductFormData = {
   code: '',
   name: '',
@@ -53,29 +64,30 @@ export function ProductForm({
 );
 
   const validateForm = (): boolean => {
-    const newErrors: Partial<Record<keyof ProductFormData, string>> = {};
+    const newErrors: FormErrors = {};
 
     if (!formData.code.trim()) newErrors.code = 'El código es obligatorio';
     if (!formData.name.trim()) newErrors.name = 'El nombre es obligatorio';
-    if (!formData.category) newErrors.category = 'La categoría es obligatoria';
-    if (!formData.subcategory.trim()) newErrors.subcategory = 'La subcategoría es obligatoria';
-    if (!formData.details.trim()) newErrors.details = 'Los detalles son obligatorios';
 
-    if (!formData.price.trim()) {
-      newErrors.price = 'El precio es obligatorio';
-    } else if (isNaN(Number(formData.price)) || Number(formData.price) <= 0) {
-      newErrors.price = 'El precio debe ser un número mayor a 0';
+    // Precio normal
+    if (!formData.price || Number(formData.price) < 0) {
+      newErrors.price = 'El precio debe ser mayor o igual a 0';
     }
 
-    if (!formData.creditPrice.trim()) {
+    // Precio a crédito - PERMITIR 0
+    if (formData.creditPrice === '' || formData.creditPrice === undefined) {
       newErrors.creditPrice = 'El precio a crédito es obligatorio';
-    } else if (isNaN(Number(formData.creditPrice)) || Number(formData.creditPrice) <= 0) {
-      newErrors.creditPrice = 'El precio a crédito debe ser un número mayor a 0';
+    } else if (Number(formData.creditPrice) < 0) {
+      newErrors.creditPrice = 'El precio a crédito debe ser mayor o igual a 0';
     }
 
-    // Validar imagen solo si es creación (no hay initialData)
+    if (!formData.details.trim()) newErrors.details = 'Los detalles son obligatorios';
+    if (!formData.category) newErrors.category = 'La categoría es obligatoria';
+    if (!formData.subcategory) newErrors.subcategory = 'La subcategoría es obligatoria';
+
+    // Imagen obligatoria solo en creación
     if (!initialData && !formData.image) {
-      newErrors.image = 'La imagen principal es obligatoria';
+      newErrors.image = 'La imagen es obligatoria';
     }
 
     setErrors(newErrors);

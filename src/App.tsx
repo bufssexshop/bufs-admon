@@ -14,86 +14,125 @@ import { LoginPage } from "@/pages/Auth/LoginPage";
 import { TermsPage } from "@/pages/Auth/TermsPage";
 import { NotFoundPage } from "@/pages/NotFound";
 import { ProfilePage } from "./pages/Profile/ProfilePage";
+import { CartProvider } from "./contexts/CartContext";
+import { CartPage } from "./pages/Cart/CartPage";
+import { MyOrdersPage } from "./pages/Orders/MyOrdersPage";
+import { OrdersManagementPage } from "./pages/Orders/OrdersManagementPage";
+import { OrderDetailPage } from "./pages/Orders/OrderDetailPage";
+import { ProductDetailPage } from "./pages/Products/ProductDetailPage";
+import { UserDetailPage } from "./pages/Users/UserDetailPage";
 
 function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          {/* Ruta pública de login */}
-          <Route path="/login" element={<LoginPage />} />
+      <CartProvider>
+        <BrowserRouter>
+          <Routes>
+            {/* Ruta pública de login */}
+            <Route path="/login" element={<LoginPage />} />
 
-          {/* Ruta de términos (requiere auth pero no términos aceptados) */}
-          <Route
-            path="/terms"
-            element={
-              <ProtectedRoute>
-                <TermsPage />
-              </ProtectedRoute>
-            }
-          />
+            {/* Ruta de términos (requiere auth pero no términos aceptados) */}
+            <Route
+              path="/terms"
+              element={
+                <ProtectedRoute>
+                  <TermsPage />
+                </ProtectedRoute>
+              }
+            />
 
-          {/* Rutas protegidas con layout */}
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute>
-                <AppLayout />
-              </ProtectedRoute>
-            }
-          >
-            {/* Rutas accesibles para todos los usuarios autenticados */}
-            <Route index element={<DashboardPage />} />
-            <Route path="productos" element={<ProductsPage />} />
-            <Route path="perfil" element={<ProfilePage />} />
+            {/* Rutas protegidas con layout */}
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute>
+                  <AppLayout />
+                </ProtectedRoute>
+              }
+            >
+              {/* Rutas accesibles para todos los usuarios autenticados */}
+              <Route index element={<DashboardPage />} />
+              <Route path="productos" element={<ProductsPage />} />
+              <Route path="productos/:id" element={<ProductDetailPage />} />
+              <Route path="perfil" element={<ProfilePage />} />
 
-            {/* Rutas solo para ADMIN */}
-            <Route
-              path="productos/nuevo"
-              element={
-                <AdminRoute>
-                  <CreateProductPage />
-                </AdminRoute>
-              }
-            />
-            <Route
-              path="productos/:id/editar"
-              element={
-                <AdminRoute>
-                  <EditProductPage />
-                </AdminRoute>
-              }
-            />
-            <Route
-              path="usuarios"
-              element={
-                <AdminRoute>
-                  <UsersPage />
-                </AdminRoute>
-              }
-            />
-            <Route
-              path="usuarios/nuevo"
-              element={
-                <AdminRoute>
-                  <CreateUserPage />
-                </AdminRoute>
-              }
-            />
-            <Route
-              path="usuarios/:id/editar"
-              element={
-                <AdminRoute>
-                  <EditUserPage />
-                </AdminRoute>
-              }
-            />
-          </Route>
+              {/* Rutas para clientes */}
+              <Route path="carrito" element={<CartPage />} />
+              <Route path="mis-pedidos" element={<MyOrdersPage />} />
 
-          {/* Ruta 404 */}
-          <Route path="*" element={<NotFoundPage />} />
-        </Routes>
-      </BrowserRouter>
+              {/* Rutas solo para ADMIN */}
+              <Route
+                path="pedidos"
+                element={
+                  <AdminRoute>
+                    <OrdersManagementPage />
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="pedidos/:id"
+                element={
+                  <AdminRoute>
+                    <OrderDetailPage />
+                  </AdminRoute>
+                }
+              />
+
+              <Route
+                path="productos/nuevo"
+                element={
+                  <AdminRoute>
+                    <CreateProductPage />
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="productos/:id/editar"
+                element={
+                  <AdminRoute>
+                    <EditProductPage />
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="usuarios"
+                element={
+                  <AdminRoute>
+                    <UsersPage />
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="usuarios/:id"
+                element={
+                  <AdminRoute>
+                    <UserDetailPage />
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="usuarios/nuevo"
+                element={
+                  <AdminRoute>
+                    <CreateUserPage />
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="usuarios/:id/editar"
+                element={
+                  <AdminRoute>
+                    <EditUserPage />
+                  </AdminRoute>
+                }
+              />
+            </Route>
+
+            {/* Ruta 404 */}
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+        </BrowserRouter>
+      </CartProvider>
     </AuthProvider>
   );
 }
